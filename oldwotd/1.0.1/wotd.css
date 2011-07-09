@@ -1,0 +1,28 @@
+html, body  {
+    height:         100%;
+    width:          100%;
+    font-family:    "Trebuchet MS",sans-serif;
+    background-color: #000000;
+    color: #bbbbbd;
+    text-align:center;
+    overflow: hidden;
+    }
+.hugeItem   { font-size:230px; }
+.largeItem  { font-size:168px; }
+.mediumItem { font-size:96px; } 
+.smallItem  { font-size:36px; }
+.tinyItem   { font-size:18px; }
+.hidden     { visibility:hidden; }
+
+
+#container  { position:relative; min-height: 100%; }
+#footer     { position: absolute; bottom: 10px; left: 0%; right: 0%; font-size:36px; }
+
+.buttonbar {
+    width: 72px;
+    position: absolute;
+    bottom: 1%;
+    top: 1%;
+    right: 11px; }
+    
+img         { margin: 2px 2px; }

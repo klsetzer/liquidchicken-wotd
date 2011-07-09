@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>                                                                  
+<head>                                                                  
+<!-- ToDo
+1) Nice collection of panel styles
+2) Support for wotd definitions
+3) turn into cgi for remote presentation
+4) separate styling from positioning
+-->
+
+<script type="text/javascript" src="jquery.js"></script>          
+<script type="text/javascript">                                         
+var wotdPanels = [ '<div class="display"><div class="largeItem">apocryphal</div><div class="footer">Word of the Day</div></div>',
+                   '<div class="display"><div class="largeItem">prosaic</div><div class="footer">Yesterday</div></div>',
+                   '<div class="display"><div class="mediumItem">Opinions are like fingers.  Most people have about ten.</div><div class="footer">Thought for Today</div></div>'];
+var wotdCurrentPanel = 0;
+
+$(function() {
+    setInterval(update, 3000);
+    $('div.display').replaceWith(wotdPanels[wotdCurrentPanel]);
+
+    function update() {
+        $('div.display').fadeOut(1000,function(){
+            wotdCurrentPanel++;
+            if(wotdCurrentPanel >= wotdPanels.length) {
+                wotdCurrentPanel = 0;
+                location.reload(); // Reload from server/file each cycle
+            }
+            $('div.display').replaceWith(wotdPanels[wotdCurrentPanel]);
+        })
+    }
+});
+
+</script>                                                               
+
+<style type="text/css">
+html, body  {height: 95%; font-family: "Trebuchet MS",sans-serif; background-color: #000000; color: #bbbbbd; text-align:center;}
+.largeItem  { font-size:204px; }
+.mediumItem { font-size:96px; } 
+.smallItem  { font-size:36px; }
+#container {
+    position: relative;
+    min-height: 100%;
+}
+.footer {
+    position: absolute;
+    bottom: 25px;
+    left: 0%; right: 0%;
+    font-size:36px;
+}
+
+</style>
+
+
+
+</head>                                                                 
+<body>                                                                  
+  <div id="container">
+    <div class="display">
+        <div class="largeItem">Item</div>
+        <div class="footer">Title</div>
+    </div>
+  </div>
+</body>                                                                 
+</html>
+

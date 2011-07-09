@@ -1,0 +1,167 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+<head><title>Word of the Day</title>
+<!-- To Do, Wishlist, etc. {{{
+To Do:
+    0) handle multiple wotd
+    1) Need to conquer multiple queries for QOTD
+    2) count multiple wotd and multiple previous wotd separately
+    3) Separate positioning CSS from styling CSS
+	4) Get working with jsapi key??
+    5) Popup to configure timing and sources
+    6) after #6, produce several themes
+    7) js loading optimization via google.load CDN
+    8) update calendar icon with today's date
+    9) vary element positioning for screen-saver-like appearance
+	A) Each panel should have its own timer
+    B) _run() call will reload feed.  How do I gracefully do a javascript reload once in a while?
+
+Panel Types:
+    . wotd
+    . previous
+    . qotd
+    . announce
+}}} -->
+<!-- Word of the Day License {{{
+This work is licensed under the MIT License (http://www.opensource.org/licenses/mit-license.php).  Some libraries, images, and other included works may be separately licensed.  See attribution or source of those works for licensing terms.
+
+Copyright (c) 2011 Kelly Setzer 
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+}}} -->
+<!-- Additional Licenses {{{
+    * Retina Display icons by The Working Group, http://www.theworkinggroup.ca
+      licensed under CC Attribution Non-Commercial Share Alike (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+      http://www.iconspedia.com/pack/retina-display-icons-3346/
+    * jQuery Javascript Library (c) 2010 The jQuery Project
+      licensed under the MIT License
+    * jQueryUI Javascript Library (c) 2010 The jQuery Project
+      licensed under the MIT License
+    * Date.js [date-en-US.js] JavaScript Date Library (c) 2006-2010, Coolite Inc. All rights reserved.
+      licensed under the MIT License
+    * Google API license(s) and TOS may apply, but I really can't tell.  No Google intellectual property is directly included in this work, although it is dependent on the Google jsapi and on various Google services.
+}}} -->
+<!-- Google jsapi with key {{{
+<script src="http://www.google.com/jsapi?key=ABQIAAAANU8OAqbJPAHXV4SpKuTEvhQx6TWrfC8bNfnC-vtzzHJYkwhD6xSt50-Z_44EojojRLDiBj3kn932Rw" type="text/javascript"></script>
+}}} -->
+<!-- Included css/js {{{ -->
+<link type="text/css" href="jquery-ui-1.8.14.custom/css/dark-hive/jquery-ui-1.8.14.custom.css" rel="stylesheet" />
+<link type="text/css" href="wotd.css" rel="stylesheet" />
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="jquery-ui-1.8.14.custom/js/jquery-ui-1.8.14.custom.min.js"></script>
+<script type="text/javascript" src="date-en-US.js"></script>
+<script src="http://www.google.com/jsapi" type="text/javascript"></script>
+<!-- Included css/js }}} -->
+
+<script type="text/javascript">
+google.load("gdata", "2.x", {packages: ["calendar"]}); // Load the Google jsapi
+
+var wotdPanels = [];
+var wotdCurrentPanel = 0;
+var dwellTime = 2000;
+var fadeTime = 1000;
+var timer;
+var feedUrl = "https://www.google.com/calendar/feeds/u6g675oejpdha4pncv50rmi8tc%40group.calendar.google.com/public/full";
+var maxResults = 4;
+var daysBack = -30;
+
+function switchFade() {
+    wotdCurrentPanel++;
+    $('div.display').fadeOut(fadeTime,function(){
+        if(wotdCurrentPanel >= wotdPanels.length) {
+            wotdCurrentPanel = 0;
+            clearInterval(timer);
+            _run();
+        } else {
+            showPanel();
+        }
+    });
+}
+
+function showPanel() {
+    $('div.display').replaceWith(wotdPanels[wotdCurrentPanel]);
+}
+
+function makePanels(entries) {
+    var eventTitle = entries.shift().getTitle().getText();
+    var panels = [];
+    panels.push('<div class="display"><div class="hugeItem">' + eventTitle + '</div><div id="footer">Word of the Day</div></div>');
+
+    var pastWords = [ ];
+    for (var i = 0; i < entries.length; i++) {
+        pastWords.push(entries[i].getTitle().getText() + '<br/>');
+    }
+    panels.push('<div class="display"><div class="largeItem">' + pastWords.join('') + '</div><div id="footer">Previous Words of the Day</div></div>');
+//    panels.push('<div class="display"><div class="largeItem">aaa</div><div id="footer">Bar</div></div>');
+//    panels.push('<div class="display"><div class="largeItem">Bloo</div><div id="footer">Berry</div></div>');
+    return(panels);
+}
+
+var callback = function (result) {
+    var entries = result.feed.getEntries();
+    wotdPanels = makePanels(entries);
+
+    $(function () {
+        $('#dialog-modal').dialog({
+            autoOpen: false,
+            title: 'Basic Dialog',
+            modal: true,
+            open: function() { clearInterval(timer) },
+            close: function() { timer = setInterval(switchFade,dwellTime) },
+        }).removeClass('hidden'); // It starts off hidden so that you can't see it during the chains of callbacks, so show it.
+		$('#btn_config').click(function() {
+            $('#dialog-modal').dialog('open'); return false; });
+
+        showPanel(); // Get started with first panel
+        timer = setInterval(switchFade,dwellTime); // Let the timer drive it with the fader from now on
+    });
+};
+    
+// Error handler to be invoked when getEventsFeed() produces an error
+var handleError = function (error) {
+    $('div.display').replaceWith('<pre>' + error + '</pre>');
+};
+
+function _run() {
+    var calendarService = new google.gdata.calendar.CalendarService('LiquidChicken-wotdDisplayer-1.0');
+    var query = new google.gdata.calendar.CalendarEventQuery(feedUrl);
+    query.setOrderBy('starttime');
+    query.setSortOrder('descending');
+    var maxDate = new google.gdata.DateTime(Date.today());
+    var minDate = new google.gdata.DateTime(Date.today().add({days: daysBack}));
+    query.setMaximumStartTime(maxDate);
+    query.setMinimumStartTime(minDate);
+    query.setMaxResults(maxResults); // Keep us out of trouble
+    calendarService.getEventsFeed(query, callback, handleError);
+}
+
+google.setOnLoadCallback(_run);
+
+
+</script>
+</head>
+
+<!-- HTML: Body {{{ --><body>
+<div id="container">
+    <div class="display">
+        <div class="largeItem"/>
+        <div id="footer">&nbsp;</div>
+    </div>
+</div>
+
+<div class="buttonbar">
+    <img id="btn_config"   src="images/Gear-UI-48.png" width="64" height="64"/>
+    <img id="btn_calendar" src="images/Calendar-UI-48.png" width="64" height="64"/>
+    <img id="btn_info"     src="images/Info-UI-48.png" width="64" height="64"/>
+</div>
+
+<div class="hidden" id="dialog-modal" title="Basic dialog">
+	<p>This is the default dialog which is useful for displaying information. The dialog window can be moved, resized and closed with the 'x' icon.</p>
+</div>
+
+</body> <!-- HTML: Body }}} -->
+</html>
