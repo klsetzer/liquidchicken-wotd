@@ -46,12 +46,12 @@ google.load("gdata", "2.x", {packages: ["calendar"]}); // Load the Google jsapi
 <script>
 $.fn.textfill = function(options) {
     var defaults = {
-        maxFontPixels: 40,
+        minFontPixels: 12,
         innerTag: 'span'
     };
     var Opts = jQuery.extend(defaults, options);
     return this.each(function() {
-        var fontSize = Opts.maxFontPixels;
+        var fontSize = Opts.minFontPixels;
         var ourText = $(Opts.innerTag + ':visible:first', this);
         var maxHeight = $(this).height();
         var maxWidth = $(this).width();
@@ -61,8 +61,8 @@ $.fn.textfill = function(options) {
             ourText.css('font-size', fontSize);
             textHeight = ourText.height();
             textWidth = ourText.width();
-            fontSize = fontSize - 1;
-        } while ((textHeight > maxHeight || textWidth > maxWidth) && fontSize > 3);
+            fontSize = fontSize + 1;
+        } while (textHeight < maxHeight && textWidth < maxWidth);
     });
 };
 </script>
@@ -118,7 +118,7 @@ function switchFade() {
 
 function showPanel() {
     $('div.display').replaceWith(wotdPanels[wotdCurrentPanel]);
-    $('.textfill').textfill({ maxFontPixels: 244, innerTag: 'span', });
+    $('.textfill').textfill({ minFontPixels: 12, innerTag: 'span', });
     timer = setTimeout(switchFade,dwellTime); 
 }
 
