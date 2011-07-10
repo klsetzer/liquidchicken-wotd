@@ -14,14 +14,16 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 }}} -->
 <!-- Additional Licenses {{{
     * Retina Display icons by The Working Group, http://www.theworkinggroup.ca
-      licensed under CC Attribution Non-Commercial Share Alike (http://creativecommons.org/licenses/by-nc-sa/3.0/)
-      http://www.iconspedia.com/pack/retina-display-icons-3346/
+        licensed under CC Attribution Non-Commercial Share Alike (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+        http://www.iconspedia.com/pack/retina-display-icons-3346/
     * jQuery Javascript Library (c) 2010 The jQuery Project
-      licensed under the MIT License
+        licensed under the MIT License
     * jQueryUI Javascript Library (c) 2010 The jQuery Project
-      licensed under the MIT License
+        licensed under the MIT License
     * Date.js [date-en-US.js] JavaScript Date Library (c) 2006-2010, Coolite Inc. All rights reserved.
-      licensed under the MIT License
+        licensed under the MIT License
+    * jquery-textfill-0.1.js (c) Russ Painter WebDesign@GeekyMonkey.com
+        no known license
     * Google API license(s) and TOS may apply, but I really can't tell.  No Google intellectual property is directly included in this work, although it is dependent on the Google jsapi and on various Google services.
 }}} -->
 <!-- Google jsapi with key {{{
@@ -40,6 +42,31 @@ google.load("gdata", "2.x", {packages: ["calendar"]}); // Load the Google jsapi
 <script type="text/javascript" src="jquery-ui/js/jquery-ui-1.8.14.custom.min.js"></script>
 <script type="text/javascript" src="date-js/date-en-US.js"></script>
 <!-- Included css and js }}} -->
+<!-- jQuery textFill {{{ -->
+<script>
+$.fn.textfill = function(options) {
+    var defaults = {
+        maxFontPixels: 40,
+        innerTag: 'span'
+    };
+    var Opts = jQuery.extend(defaults, options);
+    return this.each(function() {
+        var fontSize = Opts.maxFontPixels;
+        var ourText = $(Opts.innerTag + ':visible:first', this);
+        var maxHeight = $(this).height();
+        var maxWidth = $(this).width();
+        var textHeight;
+        var textWidth;
+        do {
+            ourText.css('font-size', fontSize);
+            textHeight = ourText.height();
+            textWidth = ourText.width();
+            fontSize = fontSize - 1;
+        } while ((textHeight > maxHeight || textWidth > maxWidth) && fontSize > 3);
+    });
+};
+</script>
+<!-- jQuery textFill }}} -->
 <!-- To Do, Wishlist, etc. {{{
 To Do:
     0) handle multiple wotd
@@ -47,14 +74,17 @@ To Do:
     2) count multiple wotd and multiple previous wotd separately
     3) Separate positioning CSS from styling CSS
 	4) Get working with jsapi key??
-    5) Popup to configure timing and sources
+    5) Popup to configure timing and sources !!!Started
     6) after #6, produce several themes
-    7) js loading optimization via google.load CDN
     8) update calendar icon with today's date
     9) vary element positioning for screen-saver-like appearance
 	A) Each panel should have its own timer
     B) _run() call will reload feed.  How do I gracefully do a javascript reload once in a while?
+    C) Panels with lots of content should block-center fill instead of just center (like previousCount=10)
+    D) Fix buttons now that textfill resize works
 
+Done:
+    *) js loading optimization via google.load CDN
 Panel Types:
     . wotd
     . previous
@@ -70,7 +100,8 @@ var fadeTime = 500;
 var timer;
 var feedUrl = "https://www.google.com/calendar/feeds/u6g675oejpdha4pncv50rmi8tc%40group.calendar.google.com/public/full";
 var maxResults = 36502; // 10 years worth of results, counting leap years
-var previousCount = 3;
+var previousCount = 10;
+var __LOADED_postLoadInit = 0;
 
 function switchFade() {
     wotdCurrentPanel++;
@@ -87,56 +118,66 @@ function switchFade() {
 
 function showPanel() {
     $('div.display').replaceWith(wotdPanels[wotdCurrentPanel]);
+    $('.textfill').textfill({ maxFontPixels: 244, innerTag: 'span', });
     timer = setTimeout(switchFade,dwellTime); 
 }
 
 function makePanels(entries) {
     var eventTitle = entries[0].getTitle().getText();
     var panels = [];
-    panels.push('<div class="display"><div class="hugeItem">' + entries[0].getTitle().getText() + '</div><div id="footer">Word of the Day</div></div>');
+    // panels.push('<div class="display"><div class="hugeItem">' + entries[0].getTitle().getText() + '</div><div id="footer">Word of the Day</div></div>');
+    panels.push('<div class="display textfill" id="subject"><span>' + entries[0].getTitle().getText() + '</span><div id="footer">Word of the Day</div></div>');
 
     var pastWords = [];
     for (var i = 1; i <= previousCount; i++) {
         pastWords.push(entries[i].getTitle().getText() + '<br/>');
     }
-    panels.push('<div class="display"><div class="largeItem">' + pastWords.join('') + '</div><div id="footer">Previous Words of the Day</div></div>');
+    // panels.push('<div class="display"><div class="largeItem">' + pastWords.join('') + '</div><div id="footer">Previous Words of the Day</div></div>');
+    panels.push('<div class="display textfill" id="subject"><span>' + pastWords.join('') + '</span><div id="footer">Previous Words of the Day</div></div>');
 //    panels.push('<div class="display"><div class="largeItem">aaa</div><div id="footer">Bar</div></div>');
 //    panels.push('<div class="display"><div class="largeItem">Bloo</div><div id="footer">Berry</div></div>');
     return(panels);
 }
 
-var callback = function (result) {
-    var entries = result.feed.getEntries();
-    wotdPanels = makePanels(entries);
-
-    $(function () {
-        // Instantiate Options Dialog
-        $('#dialog-form').dialog({
-            autoOpen: false,
-            title: 'Announcement Options',
-            modal: true,
+function postLoadInit () {
+    if (__LOADED_postLoadInit != 0) {
+        return true;
+    }
+    __LOADED_postLoadInit = 1;
+    // Instantiate Options Dialog
+    $('#dialog-form').dialog({
+        autoOpen: false,
+        title: 'Announcement Options',
+        modal: true,
 //            open: function() { clearTimeout(timer) },
 //            close: function() { timer = setTimeout(switchFade,dwellTime) },
-            buttons: {
-			    "Ok": function() { 
-				    $(this).dialog("close"); 
-                    previousCount = $( '#aro-form-input-pastwords').val();
-                    dwellTime = $( '#aro-form-input-dwell').val() * 1000;
-                    fadeTime = $( '#aro-form-input-fade').val() * 1000;
-			    }, 
-				"Cancel": function() { 
-					$(this).dialog("close"); 
-				} 
-			},
-        }).removeClass('hidden'); // It starts off hidden so that you can't see it during the chains of callbacks, so show it.
-		$('#btn_config').click(function() {
-            $('#dialog-form').dialog('open'); return false; });
+        buttons: {
+            "Ok": function() { 
+                $(this).dialog("close"); 
+                previousCount = $( '#aro-form-input-pastwords').val();
+                dwellTime = $( '#aro-form-input-dwell').val() * 1000;
+                fadeTime = $( '#aro-form-input-fade').val() * 1000;
+            }, 
+            "Cancel": function() { 
+                $(this).dialog("close"); 
+            } 
+        },
+    }).removeClass('hidden'); // It starts off hidden so that you can't see it during the chains of callbacks, so show it.
+    $('#btn_config').click(function() {
+        $('#dialog-form').dialog('open'); return false; });
 
-        document.getElementById("aro-form-input-dwell").value = dwellTime / 1000;
-        document.getElementById("aro-form-input-fade").value = fadeTime / 1000;
-        document.getElementById("aro-form-input-pastwords").value = previousCount;
+    document.getElementById("aro-form-input-dwell").value = dwellTime / 1000;
+    document.getElementById("aro-form-input-fade").value = fadeTime / 1000;
+    document.getElementById("aro-form-input-pastwords").value = previousCount;
 
-        // Get things going with the roller
+}
+
+function callback (result) {
+    var entries = result.feed.getEntries();
+    wotdPanels = makePanels(entries);
+    // Get things going with the roller
+    $(function() {
+        postLoadInit();
         showPanel(); // Get started with first panel
     });
 };
@@ -164,9 +205,9 @@ google.setOnLoadCallback(_run);
 
 <!-- HTML: Body {{{ --><body>
 <div id="container">
-    <div class="display">
-        <div class="largeItem"/>
-        <div id="footer">&nbsp;</div>
+    <div class="display" class="textfill">
+        <div id="subject"/>
+        <div id="footer"/>
     </div>
 </div>
 
