@@ -46,7 +46,7 @@ google.load("gdata", "2.x", {packages: ["calendar"]}); // Load the Google jsapi
 <script>
 $.fn.textfill = function(options) {
     var defaults = {
-        minFontPixels: 12,
+        minFontPixels: 6,
         innerTag: 'span'
     };
     var Opts = jQuery.extend(defaults, options);
@@ -100,7 +100,7 @@ var fadeTime = 500;
 var timer;
 var feedUrl = "https://www.google.com/calendar/feeds/u6g675oejpdha4pncv50rmi8tc%40group.calendar.google.com/public/full";
 var maxResults = 36502; // 10 years worth of results, counting leap years
-var previousCount = 10;
+var previousCount = 33;
 var __LOADED_postLoadInit = 0;
 
 function switchFade() {
@@ -118,7 +118,7 @@ function switchFade() {
 
 function showPanel() {
     $('div.display').replaceWith(wotdPanels[wotdCurrentPanel]);
-    $('.textfill').textfill({ minFontPixels: 12, innerTag: 'span', });
+    $('.textfill').textfill({ minFontPixels: 6, innerTag: 'span', });
     timer = setTimeout(switchFade,dwellTime); 
 }
 
