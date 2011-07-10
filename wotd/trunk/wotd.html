@@ -69,16 +69,15 @@ var dwellTime = 4500;
 var fadeTime = 500;
 var timer;
 var feedUrl = "https://www.google.com/calendar/feeds/u6g675oejpdha4pncv50rmi8tc%40group.calendar.google.com/public/full";
-var maxResults = 36500; // Keep us out of trouble - 10 years worth of results
+var maxResults = 36502; // 10 years worth of results, counting leap years
 var previousCount = 3;
-
 
 function switchFade() {
     wotdCurrentPanel++;
     $('div.display').fadeOut(fadeTime,function(){
         if(wotdCurrentPanel >= wotdPanels.length) {
             wotdCurrentPanel = 0;
-            clearInterval(timer);
+            clearTimeout(timer);
             _run();
         } else {
             showPanel();
@@ -88,6 +87,7 @@ function switchFade() {
 
 function showPanel() {
     $('div.display').replaceWith(wotdPanels[wotdCurrentPanel]);
+    timer = setTimeout(switchFade,dwellTime); 
 }
 
 function makePanels(entries) {
@@ -115,11 +115,14 @@ var callback = function (result) {
             autoOpen: false,
             title: 'Announcement Options',
             modal: true,
-//            open: function() { clearInterval(timer) },
-//            close: function() { timer = setInterval(switchFade,dwellTime) },
+//            open: function() { clearTimeout(timer) },
+//            close: function() { timer = setTimeout(switchFade,dwellTime) },
             buttons: {
 			    "Ok": function() { 
 				    $(this).dialog("close"); 
+                    previousCount = $( '#aro-form-input-pastwords').val();
+                    dwellTime = $( '#aro-form-input-dwell').val() * 1000;
+                    fadeTime = $( '#aro-form-input-fade').val() * 1000;
 			    }, 
 				"Cancel": function() { 
 					$(this).dialog("close"); 
@@ -129,20 +132,12 @@ var callback = function (result) {
 		$('#btn_config').click(function() {
             $('#dialog-form').dialog('open'); return false; });
 
-
-        document.getElementById("aro-form-input-dwell").value = dwellTime;
-        document.getElementById("aro-form-input-fade").value = fadeTime;
+        document.getElementById("aro-form-input-dwell").value = dwellTime / 1000;
+        document.getElementById("aro-form-input-fade").value = fadeTime / 1000;
         document.getElementById("aro-form-input-pastwords").value = previousCount;
-
-        $("aro-form-input-dwell").keyup(function () {
-            var value = $(this).val();
-            $("p").text(value);
-        }).keyup();
-        
 
         // Get things going with the roller
         showPanel(); // Get started with first panel
-        timer = setInterval(switchFade,dwellTime); // Let the timer drive it with the fader from now on
     });
 };
     
@@ -185,11 +180,11 @@ google.setOnLoadCallback(_run);
     <p>&nbsp;</p>
     <form id="aro-form">
     <fieldset>
-		<label for="aro-form-dwell">Dwell Time</label>
-		<input type="text" size="5" name="dwellTime" id="aro-form-input-dwell" class="text ui-widget-content ui-corner-all" />&nbsp;s
+		<label for="aro-form-input-dwell">Dwell Time</label>
+		<input type="text" size="5" id="aro-form-input-dwell" class="text ui-widget-content ui-corner-all" />&nbsp;s
         <br/>
 
-		<label for="aro-form-fade">Fade Time</label>
+		<label for="aro-form-input-fade">Fade Time</label>
 		<input type="text" size="5" name="fadeTime" id="aro-form-input-fade" class="text ui-widget-content ui-corner-all" />&nbsp;s
         <br/>
 
