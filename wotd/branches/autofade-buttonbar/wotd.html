@@ -41,6 +41,7 @@ google.load("gdata", "2.x", {packages: ["calendar"]}); // Load the Google jsapi
 
 <link type="text/css" href="jquery-ui/css/custom-theme/jquery-ui-1.8.14.custom.css" rel="stylesheet" />
 <link type="text/css" href="wotd.css" rel="stylesheet" />
+<link type="text/css" href="opacity-itnewb.css" rel="stylesheet" />
 <script type="text/javascript" src="jquery-ui/js/jquery-ui-1.8.14.custom.min.js"></script>
 <script type="text/javascript" src="date-js/date-en-US.js"></script>
 <!-- Included css and js }}} -->
@@ -212,7 +213,7 @@ google.setOnLoadCallback(_run);
 <!-- HTML: Body {{{1 -->
 <body>
 <div id="container">
-    <div id="buttonbar-topright">
+    <div id="buttonbar-topright" class="fadeAble">
         <img id="btn_config"   src="images/Gear-UI-48.png" width="48" height="48"/>
         <img id="btn_calendar" src="images/Calendar-UI-48.png" width="48" height="48"/>
         <img id="btn_info"     src="images/Info-UI-48.png" width="48" height="48"/>
