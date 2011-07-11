@@ -1,24 +1,16 @@
-<!-- To Do, Wishlist, etc. {{{2
 To Do:
-    0) handle multiple wotd
-    1) Need to conquer multiple queries for QOTD
+    1) multiple sources
     2) count multiple wotd and multiple previous wotd separately
-    3) Separate positioning CSS from styling CSS
+    3) Separate positioning CSS from styling CSS.  Why???
 	4) Get working with jsapi key??
-    5) Popup to configure timing and sources !!!Started
-    6) after #6, produce several themes
-    8) update calendar icon with today's date
-    9) vary element positioning for screen-saver-like appearance
-	A) Each panel should have its own timer
-    B) _run() call will reload feed.  How do I gracefully do a javascript reload once in a while?
-    C) Panels with lots of content should block-center fill instead of just center (like previousCount=10)
-    D) Fix buttons now that textfill resize works
+    5) Make themable (themeroller?)
+    6) update calendar icon with today's date
+	7) Each panel should have its own timer
+    8) Choose feeds via configurator
+    9) Style dialog window
 
-Done:
-    *) js loading optimization via google.load CDN
 Panel Types:
     . wotd
     . previous
     . qotd
     . announce
-}}} -->
