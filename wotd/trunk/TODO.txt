@@ -1,5 +1,6 @@
 To Do:
     1) multiple sources
+    .) handle multiple events per day
     2) count multiple wotd and multiple previous wotd separately
     3) Separate positioning CSS from styling CSS.  Why???
 	4) Get working with jsapi key??
