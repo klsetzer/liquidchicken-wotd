@@ -72,21 +72,36 @@ $.fn.textfill = function(options) {
 <!-- Main JavaScript {{{2 -->
 <script>
 var feedUrl = "https://www.google.com/calendar/feeds/u6g675oejpdha4pncv50rmi8tc%40group.calendar.google.com/public/full";
-var maxResults = 3652; // 10 years worth of results, counting leap years
+var maxResults = 4; // 10 years worth of results, counting leap years
 var tableDim = 0;
 
 function callback (result) {
     var entries = result.feed.getEntries();
     tableDim = Math.ceil(Math.sqrt(entries.length));
-    var tt = "";
+    var tt = '';
+    var k = 0;
+    // Construct empty table
     for (var i=0; i < tableDim; i++) {
-        tt = tt + "<tr><td>row " + i + "</td>";
+        tt = tt + "<tr>";
         for (var j = 0; j < tableDim; j++) {
-            tt = tt + "<td>di " + j + "</td>";
+            tt = tt + '<td><div id="cell_' + k + '" />&nbsp;</td>';
+            k++;
         }
         tt = tt + "</tr>";
     }
+    // Add the table to the DOM
     $('.sillyTable > tbody:last').append(tt);
+
+    // Populate table cells
+    k=0;
+    $.each(entries, function(index,word) {
+        var text = word.getTitle().getText();
+        $('#cell_' + k).replaceWith(text);
+//        $('#cell_0').replaceWith('<div>' + text + '</div>');
+        k++;
+    });
+
+    // Add some stats
     $("#container").append("<h2>" + entries.length + " words </h2><br/><h3>Table Dimension: " + tableDim + "</h3>");
 };
     
