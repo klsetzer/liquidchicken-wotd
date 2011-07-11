@@ -1,6 +1,26 @@
 <!-- WOTD Table Style -->
 
-#wordMatrix table {
-    font-color: blue;
+table.sillyTable {
+	border-width: 2px;
+	border-spacing: 5px;
+	border-style: dotted;
+	border-color: blue;
+	border-collapse: collapse;
+	background-color: white;
 }
+table.sillyTable th {
+	border-width: 1px;
+	padding: 5px;
+	border-style: inset;
+	border-color: green;
+	background-color: white;
+}
+table.sillyTable td {
+	border-width: 1px;
+	padding: 5px;
+	border-style: inset;
+	border-color: green;
+	background-color: white;
+}
+
 
