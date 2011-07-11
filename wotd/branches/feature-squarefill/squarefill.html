@@ -71,12 +71,11 @@ $.fn.textfill = function(options) {
 <!-- Main JavaScript {{{2 -->
 <script>
 var feedUrl = "https://www.google.com/calendar/feeds/u6g675oejpdha4pncv50rmi8tc%40group.calendar.google.com/public/full";
-var maxResults = 3; // 10 years worth of results, counting leap years
-var tableDim = 0;
+var maxResults = 55; 
+var itemsThreshold = 5; // More than this, and we make a table
 
-function callback (result) {
-    var entries = result.feed.getEntries();
-    tableDim = Math.ceil(Math.sqrt(entries.length));
+function tableWords (entries) {
+    var tableDim = Math.ceil(Math.sqrt(entries.length));
     var tt = '';
     var k = 0;
     // Construct empty table
@@ -99,6 +98,23 @@ function callback (result) {
 
     // Add some stats
     $("#container").append('<div class="tinyItem">Word Count: ' + entries.length + '<br/>Table Dimension: ' + tableDim + '</div>');
+}
+
+function simpleWords (entries) {
+    var pastWords = [];
+    $.each(entries, function(index,word) {
+        pastWords.push(word.getTitle().getText() + '<br/>');
+    });
+    $('#goo').replaceWith('<div class="textfill"><div id="subject"><span>' + pastWords.join('') + '</span></div></div><div id="footer">Previous Words of the Day</div>');
+}
+
+function callback (result) {
+    var entries = result.feed.getEntries();
+    if (entries.length > itemsThreshold) {
+        tableWords(entries);
+    } else {
+        simpleWords(entries);
+    }
 };
     
 // Error handler to be invoked when getEventsFeed() produces an error
@@ -111,9 +127,7 @@ function _run() {
     var query = new google.gdata.calendar.CalendarEventQuery(feedUrl);
     query.setOrderBy('starttime');
     query.setSortOrder('descending');
-    var maxDate = new google.gdata.DateTime(Date.today());
-    query.setMaximumStartTime(maxDate);
-    query.setMaxResults(maxResults); // Keep us out of trouble
+    query.setMaxResults(maxResults);
     calendarService.getEventsFeed(query, callback, handleError);
 }
 
