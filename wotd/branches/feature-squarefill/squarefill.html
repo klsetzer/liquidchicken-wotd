@@ -38,7 +38,6 @@ google.load("gdata", "2.x", {packages: ["calendar"]}); // Load the Google jsapi
 
 <link type="text/css" href="jquery-ui/css/custom-theme/jquery-ui-1.8.14.custom.css" rel="stylesheet" />
 <link type="text/css" href="wotd.css" rel="stylesheet" />
-<link type="text/css" href="wotd-table.css" rel="stylesheet" />
 <script type="text/javascript" src="jquery-ui/js/jquery-ui-1.8.14.custom.min.js"></script>
 <script type="text/javascript" src="date-js/date-en-US.js"></script>
 <!-- Included css and js }}} -->
@@ -72,7 +71,7 @@ $.fn.textfill = function(options) {
 <!-- Main JavaScript {{{2 -->
 <script>
 var feedUrl = "https://www.google.com/calendar/feeds/u6g675oejpdha4pncv50rmi8tc%40group.calendar.google.com/public/full";
-var maxResults = 4; // 10 years worth of results, counting leap years
+var maxResults = 3; // 10 years worth of results, counting leap years
 var tableDim = 0;
 
 function callback (result) {
@@ -84,7 +83,7 @@ function callback (result) {
     for (var i=0; i < tableDim; i++) {
         tt = tt + "<tr>";
         for (var j = 0; j < tableDim; j++) {
-            tt = tt + '<td><div id="cell_' + k + '" />&nbsp;</td>';
+            tt = tt + '<td><div id="cell_' + k + '" /></td>';
             k++;
         }
         tt = tt + "</tr>";
@@ -93,16 +92,13 @@ function callback (result) {
     $('.sillyTable > tbody:last').append(tt);
 
     // Populate table cells
-    k=0;
     $.each(entries, function(index,word) {
         var text = word.getTitle().getText();
-        $('#cell_' + k).replaceWith(text);
-//        $('#cell_0').replaceWith('<div>' + text + '</div>');
-        k++;
+        $('#cell_' + index).replaceWith(text);
     });
 
     // Add some stats
-    $("#container").append("<h2>" + entries.length + " words </h2><br/><h3>Table Dimension: " + tableDim + "</h3>");
+    $("#container").append('<div class="tinyItem">Word Count: ' + entries.length + '<br/>Table Dimension: ' + tableDim + '</div>');
 };
     
 // Error handler to be invoked when getEventsFeed() produces an error
