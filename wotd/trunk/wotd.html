@@ -79,9 +79,11 @@ var wotdCurrentPanel = 0;
 var dwellTime = 1222;
 var fadeTime = 500;
 var timer;
-var feedUrl = "https://www.google.com/calendar/feeds/u6g675oejpdha4pncv50rmi8tc%40group.calendar.google.com/public/full";
+var feedUrl = "https://www.google.com/calendar/feeds/u6g675oejpdha4pncv50rmi8tc%40group.calendar.google.com/public/basic";
+var feedUrltotd  = "https://www.google.com/calendar/feeds/te8k0626iqt47ah82242on0mk0%40group.calendar.google.com/public/basic";
+
 var maxResults = 3652; // 10 years worth of results, counting leap years
-var previousCount = 11;
+var previousCount = 4;
 var __LOADED_postLoadInit = 0;
 
 function switchFade() {
@@ -135,8 +137,10 @@ function postLoadInit () {
         buttons: {
             "Ok": function() { 
                 $(this).dialog("close"); 
+                feedUrl = $( '#aro-form-input-source' ).val();
                 dwellTime = $( '#aro-form-input-dwell').val() * 1000;
                 fadeTime = $( '#aro-form-input-fade').val() * 1000;
+                _run();
             }, 
             "Cancel": function() { 
                 $(this).dialog("close"); 
@@ -210,9 +214,11 @@ google.setOnLoadCallback(_run);
 
 
 <div class="hidden" id="dialog-form" title="Announcement Options">
-    <p>&nbsp;</p>
     <form id="aro-form">
     <fieldset>
+		<label for="aro-form-input-source">Word Source</label>
+		<input type="text" size="10" name="wordSource" id="aro-form-input-source" class="text ui-widget-content ui-corner-all"/>
+        <br/>
 		<label for="aro-form-input-dwell">Dwell Time</label>
 		<input type="text" size="5" id="aro-form-input-dwell" class="text ui-widget-content ui-corner-all" />&nbsp;s
         <br/>
@@ -225,7 +231,6 @@ google.setOnLoadCallback(_run);
             <input type="text" size="3" id="amount" class="text ui-widget-content ui-corner-all"/>
         </p>
         <div id="aro-form-input-pastwords"/>
-    
 	</fieldset>
     </form>
 </div>
