@@ -1,0 +1,2 @@
+    * Date.js [date-en-US.js] JavaScript Date Library (c) 2006-2010, Coolite Inc. All rights reserved.
+        licensed under the MIT License

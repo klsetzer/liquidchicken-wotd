@@ -1,0 +1,3 @@
+    * Google API license(s) and TOS may apply, but I really can't tell.  No
+      Google intellectual property is directly included in this work, although
+      it is dependent on the Google jsapi and on various Google services.

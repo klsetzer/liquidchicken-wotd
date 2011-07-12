@@ -1,0 +1,2 @@
+    * jQueryUI Javascript Library (c) 2010 The jQuery Project
+        licensed under the MIT License
