@@ -9,9 +9,15 @@ To Do:
 	7) Each panel should have its own timer
     8) Choose feeds via configurator
     9) Style dialog window
+    .) slider for number of previous WOTD
+    .) form input for URL
 
 Panel Types:
     . wotd
     . previous
     . qotd
     . announce
+
+Waiting:
+    . WOTD history can fill a table with squareFill
+

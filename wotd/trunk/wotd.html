@@ -76,7 +76,7 @@ $.fn.textfill = function(options) {
 
 var wotdPanels = [];
 var wotdCurrentPanel = 0;
-var dwellTime = 4500;
+var dwellTime = 1222;
 var fadeTime = 500;
 var timer;
 var feedUrl = "https://www.google.com/calendar/feeds/u6g675oejpdha4pncv50rmi8tc%40group.calendar.google.com/public/full";
@@ -106,7 +106,7 @@ function showPanel() {
 function makePanels(entries) {
     var eventTitle = entries[0].getTitle().getText();
     var panels = [];
-    panels.push('<div class="display"><div class="textfill" id="subject"><span>' + entries[0].getTitle().getText() + '</span></div><div id="footer">Previous Words of the Day</div></div>');
+    panels.push('<div class="display"><div class="textfill" id="subject"><span>' + entries[0].getTitle().getText() + '</span></div><div id="footer">Word of the Day</div></div>');
 
     var pastWords = [];
     for (var i = 1; i <= previousCount; i++) {
@@ -135,7 +135,6 @@ function postLoadInit () {
         buttons: {
             "Ok": function() { 
                 $(this).dialog("close"); 
-                previousCount = $( '#aro-form-input-pastwords').val();
                 dwellTime = $( '#aro-form-input-dwell').val() * 1000;
                 fadeTime = $( '#aro-form-input-fade').val() * 1000;
             }, 
@@ -149,8 +148,18 @@ function postLoadInit () {
 
     document.getElementById("aro-form-input-dwell").value = dwellTime / 1000;
     document.getElementById("aro-form-input-fade").value = fadeTime / 1000;
-    document.getElementById("aro-form-input-pastwords").value = previousCount;
 
+    $( "#aro-form-input-pastwords" ).slider({
+        range: "max",
+        min: 1,
+        max: 33,
+        value: previousCount,
+        slide: function( event, ui ) {
+            $( "#amount" ).val( ui.value );
+            previousCount = ui.value;
+        }
+    });
+    $( "#amount" ).val( $( "#aro-form-input-pastwords" ).slider( "value" ) );
 }
 
 function callback (result) {
@@ -211,9 +220,12 @@ google.setOnLoadCallback(_run);
 		<label for="aro-form-input-fade">Fade Time</label>
 		<input type="text" size="5" name="fadeTime" id="aro-form-input-fade" class="text ui-widget-content ui-corner-all" />&nbsp;s
         <br/>
-
-		<label for="aro-form-pastwords">Previous Words</label>
-		<input type="text" size="2" name="previousCount" id="aro-form-input-pastwords" class="text ui-widget-content ui-corner-all" />
+        <p>
+            <label for="amount">Past Words:</label>
+            <input type="text" size="3" id="amount" class="text ui-widget-content ui-corner-all"/>
+        </p>
+        <div id="aro-form-input-pastwords"/>
+    
 	</fieldset>
     </form>
 </div>
