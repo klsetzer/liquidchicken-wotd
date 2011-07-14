@@ -31,6 +31,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 <!-- Included css and js {{{2 -->
 <!-- This mess needs to be fixed.  The order is very sensitive and can cause problems. -->
 <script src="http://www.google.com/jsapi" type="text/javascript"></script>
+<script type="text/javascript" src="date-js/date-en-US.js"></script>
 <script type="text/javascript">
 google.load("jquery", "1.6.2");
 google.load("gdata", "2.x", {packages: ["calendar"]}); // Load the Google jsapi
@@ -70,74 +71,89 @@ $.fn.textfill = function(options) {
 <!-- jQuery textFill }}} -->
 <!-- Main JavaScript {{{2 -->
 <script>
-
-var wotdPanels = [];
-var wotdCurrentPanel = 0;
-var dwellTime = 4500;
-var fadeTime = 500;
-var timer;
 var feedUrl = "https://www.google.com/calendar/feeds/u6g675oejpdha4pncv50rmi8tc%40group.calendar.google.com/public/full";
-var maxResults = 3652; // 10 years worth of results, counting leap years
-var previousCount = 11;
-var __LOADED_postLoadInit = 0;
+var maxResults = 3652;
+var maxTableWidth = 10; // wotd history table can be no wider than 10 cells
+var itemsThreshold = 0; // More than this, and we make a table
+// Encourage table into shape more conducive to words that are much wider than taller, e.g. 'hemidemisemiquaver'
+// For every 9 x (cols) there should be about 32 y (rows);
+var aspectRatioAdjust = 9 / 32;
 
-function makePanels(entries) {
-    var eventTitle = entries[0].getTitle().getText();
-    var panels = [];
-    panels.push('<div class="display"><div class="textfill" id="subject"><span>' + entries[0].getTitle().getText() + '</span></div><div id="footer">Previous Words of the Day</div></div>');
-
-    var pastWords = [];
-    for (var i = 1; i <= previousCount; i++) {
-        pastWords.push(entries[i].getTitle().getText() + '<br/>');
+function wotdHistory (entries) {
+    function tableXY(numItems,aspectRatio) {
+        var x = 1; var y = 1;
+        do {
+            if ((x/y) > aspectRatio) {
+                y++;
+            } else {
+                x++;
+                y = Math.ceil(y * aspectRatio);
+            }
+        } while((x * y) < numItems);
+        return {x:x,y:y};
     }
-    <div class="display">
-        <div class="textfill"><div id="subject"/></div>
-        <div id="footer"/>
-    </div>
-    panels.push('<div class="display"><div class="textfill" id="subject"><span>' + pastWords.join('') + '</span></div><div id="footer">Previous Words of the Day</div></div>');
-    return(panels);
-}
 
-function postLoadInit () {
-    if (__LOADED_postLoadInit != 0) {
-        return true;
+    function tableWords(entries) {
+        var tableDim = Math.ceil(Math.sqrt(entries.length));
+        var tt = '';
+        var k = 0;
+        // Construct empty table
+        for (var i=0; i < dim.y; i++) {
+            tt = tt + "<tr>";
+            for (var j = 0; j < dim.x; j++) {
+                tt = tt + '<td><div id="cell_' + k + '">' + i + '/' + j + '</div></td>';
+                k++;
+            }
+            tt = tt + "</tr>";
+        }
+        // Add the table to the DOM
+        $('.wotd-history-table > tbody:last').replaceWith('<tbody><tr></tr>' + tt + '</tbody>');
+
+        // Populate table cells
+        $.each(rawWords(entries), function(index,word) {
+            $('#cell_' + index).replaceWith(word);
+        });
+
+        // Add some stats
+        $("#stats").replaceWith('<div id="stats" class="tinyItem">words: ' + entries.length + ' x: ' + dim.x + ' y: ' + dim.y);
     }
-    __LOADED_postLoadInit = 1;
-    // Instantiate Options Dialog
-    $('#dialog-form').dialog({
-        autoOpen: false,
-        title: 'Announcement Options',
-        modal: true,
-        // open: function() { clearTimeout(timer) },
-        // close: function() { timer = setTimeout(switchFade,dwellTime) },
-        buttons: {
-            "Ok": function() { 
-                $(this).dialog("close"); 
-                previousCount = $( '#aro-form-input-pastwords').val();
-                dwellTime = $( '#aro-form-input-dwell').val() * 1000;
-                fadeTime = $( '#aro-form-input-fade').val() * 1000;
-            }, 
-            "Cancel": function() { 
-                $(this).dialog("close"); 
-            } 
-        },
-    }).removeClass('hidden'); // It starts off hidden so that you can't see it during the chains of callbacks, so show it.
-    $('#btn_config').click(function() {
-        $('#dialog-form').dialog('open'); return false; });
+    function rawWords(entries) {
+        var w = [];
+        $.each(entries, function(index,word) {
+            w.push(word.getTitle().getText());
+        });
+        return w.sort();
+    }
 
-    document.getElementById("aro-form-input-dwell").value = dwellTime / 1000;
-    document.getElementById("aro-form-input-fade").value = fadeTime / 1000;
-    document.getElementById("aro-form-input-pastwords").value = previousCount;
+    function simpleWords (entries) {
+        var pastWords = [];
+        $.each(entries, function(index,word) {
+            pastWords.push(word.getTitle().getText() + '<br/>');
+        });
+        $('#goo').replaceWith('<div class="textfill"><div id="subject"><span>' + pastWords.join('') + '</span></div></div><div id="footer">Previous Words of the Day</div>');
+    }
+
+    var wc = entries.length;
+    var dim = tableXY(wc,aspectRatioAdjust);
+
+    if (wc > itemsThreshold) {
+        tableWords(entries);
+    } else {
+        simpleWords(entries);
+    }
 
 }
 
 function callback (result) {
     var entries = result.feed.getEntries();
-    wotdPanels = makePanels(entries);
-    // Get things going with the roller
-    $(function() {
-        postLoadInit();
-    });
+    var numItems = 1;
+    var timer = setInterval(function() {
+        wotdHistory(entries.slice(0,numItems));
+        if (numItems > entries.length + 1) {
+            clearInterval(timer);
+        }
+        numItems++;
+    }, 4);
 };
     
 // Error handler to be invoked when getEventsFeed() produces an error
@@ -148,11 +164,9 @@ var handleError = function (error) {
 function _run() {
     var calendarService = new google.gdata.calendar.CalendarService('LiquidChicken-wotdDisplayer-1.0');
     var query = new google.gdata.calendar.CalendarEventQuery(feedUrl);
-    query.setOrderBy('starttime');
-    query.setSortOrder('descending');
-    var maxDate = new google.gdata.DateTime(Date.today());
-    query.setMaximumStartTime(maxDate);
-    query.setMaxResults(maxResults); // Keep us out of trouble
+//    var maxDate = new google.gdata.DateTime(Date.today().add({years: 1}));
+//    query.setMaximumStartTime(maxDate);
+    query.setMaxResults(maxResults);
     calendarService.getEventsFeed(query, callback, handleError);
 }
 
@@ -165,10 +179,13 @@ google.setOnLoadCallback(_run);
 <!-- HTML: Body {{{1 -->
 <body>
 <div id="container">
-
+    <div id="goo">
+        <table class="wotd-history-table">
+            <tbody><tr></tr></tbody>
+        </table>
+    </div>
+    <div id="stats"/>
 </div>
-
-
 </body>
 <!-- HTML: Body }}} -->
 </html>
