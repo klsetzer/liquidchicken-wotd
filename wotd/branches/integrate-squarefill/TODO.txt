@@ -1,0 +1,23 @@
+To Do:
+    1) multiple sources
+    .) handle multiple events per day
+    2) count multiple wotd and multiple previous wotd separately
+    3) Separate positioning CSS from styling CSS.  Why???
+	4) Get working with jsapi key??
+    5) Make themable (themeroller?)
+    6) update calendar icon with today's date
+	7) Each panel should have its own timer
+    8) Choose feeds via configurator
+    9) Style dialog window
+    .) slider for number of previous WOTD
+    .) form input for URL
+
+Panel Types:
+    . wotd
+    . previous
+    . qotd
+    . announce
+
+Waiting:
+    . WOTD history can fill a table with squareFill
+

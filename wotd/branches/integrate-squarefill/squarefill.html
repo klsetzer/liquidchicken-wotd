@@ -1,0 +1,191 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<!-- $Rev$ --> <!-- $Author: 20 $ --> <!-- $Id: 20 $ -->
+<html>
+<!-- HTML: Head {{{1 -->
+<head><title>Square Fill Test</title>
+<!-- Word of the Day License {{{2
+This work is licensed under the MIT License (http://www.opensource.org/licenses/mit-license.php).  Some libraries, images, and other included works may be separately licensed.  See attribution or source of those works for licensing terms.
+
+Copyright (c) 2011 Kelly Setzer 
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+}}} -->
+<!-- Additional Licenses {{{2
+    * Retina Display icons by The Working Group, http://www.theworkinggroup.ca
+        licensed under CC Attribution Non-Commercial Share Alike (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+        http://www.iconspedia.com/pack/retina-display-icons-3346/
+    * jQuery Javascript Library (c) 2010 The jQuery Project
+        licensed under the MIT License
+    * jQueryUI Javascript Library (c) 2010 The jQuery Project
+        licensed under the MIT License
+    * Date.js [date-en-US.js] JavaScript Date Library (c) 2006-2010, Coolite Inc. All rights reserved.
+        licensed under the MIT License
+    * jquery-textfill-0.1.js (c) Russ Painter WebDesign@GeekyMonkey.com
+        no known license
+    * Google API license(s) and TOS may apply, but I really can't tell.  No Google intellectual property is directly included in this work, although it is dependent on the Google jsapi and on various Google services.
+}}} -->
+<!-- Included css and js {{{2 -->
+<!-- This mess needs to be fixed.  The order is very sensitive and can cause problems. -->
+<script src="http://www.google.com/jsapi" type="text/javascript"></script>
+<script type="text/javascript" src="date-js/date-en-US.js"></script>
+<script type="text/javascript">
+google.load("jquery", "1.6.2");
+google.load("gdata", "2.x", {packages: ["calendar"]}); // Load the Google jsapi
+</script>
+
+<link type="text/css" href="jquery-ui/css/custom-theme/jquery-ui-1.8.14.custom.css" rel="stylesheet" />
+<link type="text/css" href="wotd.css" rel="stylesheet" />
+<script type="text/javascript" src="jquery-ui/js/jquery-ui-1.8.14.custom.min.js"></script>
+<script type="text/javascript" src="date-js/date-en-US.js"></script>
+<!-- Included css and js }}} -->
+<!-- jQuery textFill {{{2 -->
+<script>
+$.fn.textfill = function(options) {
+    var defaults = {
+        minFontPixels: 16,
+        maxFontPixels: 144,
+        fontIncrement: 8,
+        innerTag: 'span'
+    };
+    var Opts = jQuery.extend(defaults, options);
+    return this.each(function() {
+        var fontSize = Opts.minFontPixels;
+        var ourText = $(Opts.innerTag + ':visible:first', this);
+        var maxHeight = $(this).height();
+        var maxWidth = $(this).width();
+        var textHeight;
+        var textWidth;
+        do {
+            ourText.css('font-size', fontSize);
+            textHeight = ourText.height();
+            textWidth = ourText.width();
+            fontSize = fontSize + Opts.fontIncrement;
+        } while ((textHeight < maxHeight) && (textWidth < maxWidth) && (fontSize <= Opts.maxFontPixels));
+    });
+};
+</script>
+<!-- jQuery textFill }}} -->
+<!-- Main JavaScript {{{2 -->
+<script>
+var feedUrl = "https://www.google.com/calendar/feeds/u6g675oejpdha4pncv50rmi8tc%40group.calendar.google.com/public/full";
+var maxResults = 3652;
+var maxTableWidth = 10; // wotd history table can be no wider than 10 cells
+var itemsThreshold = 0; // More than this, and we make a table
+// Encourage table into shape more conducive to words that are much wider than taller, e.g. 'hemidemisemiquaver'
+// For every 9 x (cols) there should be about 32 y (rows);
+var aspectRatioAdjust = 9 / 32;
+
+function wotdHistory (entries) {
+    function tableXY(numItems,aspectRatio) {
+        var x = 1; var y = 1;
+        do {
+            if ((x/y) > aspectRatio) {
+                y++;
+            } else {
+                x++;
+                y = Math.ceil(y * aspectRatio);
+            }
+        } while((x * y) < numItems);
+        return {x:x,y:y};
+    }
+
+    function tableWords(entries) {
+        var tableDim = Math.ceil(Math.sqrt(entries.length));
+        var tt = '';
+        var k = 0;
+        // Construct empty table
+        for (var i=0; i < dim.y; i++) {
+            tt = tt + "<tr>";
+            for (var j = 0; j < dim.x; j++) {
+                tt = tt + '<td><div id="cell_' + k + '">' + i + '/' + j + '</div></td>';
+                k++;
+            }
+            tt = tt + "</tr>";
+        }
+        // Add the table to the DOM
+        $('.wotd-history-table > tbody:last').replaceWith('<tbody><tr></tr>' + tt + '</tbody>');
+
+        // Populate table cells
+        $.each(rawWords(entries), function(index,word) {
+            $('#cell_' + index).replaceWith(word);
+        });
+
+        // Add some stats
+        $("#stats").replaceWith('<div id="stats" class="tinyItem">words: ' + entries.length + ' x: ' + dim.x + ' y: ' + dim.y);
+    }
+    function rawWords(entries) {
+        var w = [];
+        $.each(entries, function(index,word) {
+            w.push(word.getTitle().getText());
+        });
+        return w.sort();
+    }
+
+    function simpleWords (entries) {
+        var pastWords = [];
+        $.each(entries, function(index,word) {
+            pastWords.push(word.getTitle().getText() + '<br/>');
+        });
+        $('#goo').replaceWith('<div class="textfill"><div id="subject"><span>' + pastWords.join('') + '</span></div></div><div id="footer">Previous Words of the Day</div>');
+    }
+
+    var wc = entries.length;
+    var dim = tableXY(wc,aspectRatioAdjust);
+
+    if (wc > itemsThreshold) {
+        tableWords(entries);
+    } else {
+        simpleWords(entries);
+    }
+
+}
+
+function callback (result) {
+    var entries = result.feed.getEntries();
+    var numItems = 1;
+    var timer = setInterval(function() {
+        wotdHistory(entries.slice(0,numItems));
+        if (numItems > entries.length + 1) {
+            clearInterval(timer);
+        }
+        numItems++;
+    }, 4);
+};
+    
+// Error handler to be invoked when getEventsFeed() produces an error
+var handleError = function (error) {
+    $('div.display').replaceWith('<pre>' + error + '</pre>');
+};
+
+function _run() {
+    var calendarService = new google.gdata.calendar.CalendarService('LiquidChicken-wotdDisplayer-1.0');
+    var query = new google.gdata.calendar.CalendarEventQuery(feedUrl);
+//    var maxDate = new google.gdata.DateTime(Date.today().add({years: 1}));
+//    query.setMaximumStartTime(maxDate);
+    query.setMaxResults(maxResults);
+    calendarService.getEventsFeed(query, callback, handleError);
+}
+
+google.setOnLoadCallback(_run);
+
+</script>
+<!-- Main JavaScript }}} -->
+</head>
+<!-- /HEAD }}} -->
+<!-- HTML: Body {{{1 -->
+<body>
+<div id="container">
+    <div id="goo">
+        <table class="wotd-history-table">
+            <tbody><tr></tr></tbody>
+        </table>
+    </div>
+    <div id="stats"/>
+</div>
+</body>
+<!-- HTML: Body }}} -->
+</html>
