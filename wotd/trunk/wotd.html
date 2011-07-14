@@ -132,11 +132,7 @@ function makePanels(entries) {
     for (var i = 1; i <= previousCount; i++) {
         pastWords.push(entries[i].getTitle().getText() + '<br/>');
     }
-    <div class="display">
-        <div class="textfill"><div id="subject"/></div>
-        <div id="footer"/>
-    </div>
-    panels.push('<div class="display"><div class="textfill" id="subject"><span>' + pastWords.join('') + '</span></div><div id="footer">Previous Words of the Day</div></div>');
+    panels.push('<div class="display"><div class="textfill"><div id="subject"><span>' + pastWords.join('') + '</span></div></div><div id="footer">Previous Words of the Day</div></div>');
     return(panels);
 }
 
@@ -202,10 +198,10 @@ var handleError = function (error) {
 function _run() {
     var calendarService = new google.gdata.calendar.CalendarService('LiquidChicken-wotdDisplayer-1.0');
     var query = new google.gdata.calendar.CalendarEventQuery(feedUrl);
-    query.setOrderBy('starttime');
-    query.setSortOrder('descending');
-    var maxDate = new google.gdata.DateTime(Date.today());
-    query.setMaximumStartTime(maxDate);
+//    query.setOrderBy('starttime');
+//    query.setSortOrder('descending');
+//    var maxDate = new google.gdata.DateTime(Date.today().add({years: 1}));
+//    query.setMaximumStartTime(maxDate);
     query.setMaxResults(maxResults); // Keep us out of trouble
     calendarService.getEventsFeed(query, callback, handleError);
 }
@@ -225,7 +221,7 @@ google.setOnLoadCallback(_run);
         <img id="btn_info"     src="images/Info-UI-48.png" width="48" height="48"/>
     </div>
     <div class="display">
-        <div class="textfill"><div id="subject"/></div>
+        <div class="textfill"><div id="subject"><span></span></div></div>
         <div id="footer"/>
     </div>
 </div>
