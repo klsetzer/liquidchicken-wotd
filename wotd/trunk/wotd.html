@@ -166,18 +166,19 @@ function postLoadInit () {
 
     document.getElementById("aro-form-input-dwell").value = dwellTime / 1000;
     document.getElementById("aro-form-input-fade").value = fadeTime / 1000;
+    document.getElementById("aro-form-input-source").value = feedUrl;
 
-    $( "#aro-form-input-pastwords" ).slider({
+    $( "#aro-form-slider-pastwords" ).slider({
         range: "max",
         min: 1,
         max: 33,
         value: previousCount,
         slide: function( event, ui ) {
-            $( "#amount" ).val( ui.value );
+            $( "#aro-form-textbox-pastwords" ).val( ui.value );
             previousCount = ui.value;
         }
     });
-    $( "#amount" ).val( $( "#aro-form-input-pastwords" ).slider( "value" ) );
+    $( "#aro-form-textbox-pastwords" ).val( $( "#aro-form-slider-pastwords" ).slider( "value" ) );
 }
 
 function callback (result) {
@@ -198,10 +199,10 @@ var handleError = function (error) {
 function _run() {
     var calendarService = new google.gdata.calendar.CalendarService('LiquidChicken-wotdDisplayer-1.0');
     var query = new google.gdata.calendar.CalendarEventQuery(feedUrl);
-//    query.setOrderBy('starttime');
-//    query.setSortOrder('descending');
-//    var maxDate = new google.gdata.DateTime(Date.today().add({years: 1}));
-//    query.setMaximumStartTime(maxDate);
+    query.setOrderBy('starttime');
+    query.setSortOrder('descending');
+    var maxDate = new google.gdata.DateTime(Date.today());
+    query.setMaximumStartTime(maxDate);
     query.setMaxResults(maxResults); // Keep us out of trouble
     calendarService.getEventsFeed(query, callback, handleError);
 }
@@ -215,7 +216,7 @@ google.setOnLoadCallback(_run);
 <!-- HTML: Body {{{1 -->
 <body>
 <div id="container">
-    <div id="buttonbar-topright" class="fadeAble">
+    <div id="buttonbar-bottom" class="fadeAble">
         <img id="btn_config"   src="images/Gear-UI-48.png" width="48" height="48"/>
         <img id="btn_calendar" src="images/Calendar-UI-48.png" width="48" height="48"/>
         <img id="btn_info"     src="images/Info-UI-48.png" width="48" height="48"/>
@@ -225,7 +226,6 @@ google.setOnLoadCallback(_run);
         <div id="footer"/>
     </div>
 </div>
-
 
 <div class="hidden" id="dialog-form" title="Announcement Options">
     <form id="aro-form">
@@ -240,11 +240,11 @@ google.setOnLoadCallback(_run);
 		<label for="aro-form-input-fade">Fade Time</label>
 		<input type="text" size="5" name="fadeTime" id="aro-form-input-fade" class="text ui-widget-content ui-corner-all" />&nbsp;s
         <br/>
-        <p>
-            <label for="amount">Past Words:</label>
-            <input type="text" size="3" id="amount" class="text ui-widget-content ui-corner-all"/>
-        </p>
-        <div id="aro-form-input-pastwords"/>
+            <div id="aro-form-part-past">
+                <label for="aro-form-textbox-pastwords">Past Words:</label>
+                <input type="text" size="3" id="aro-form-textbox-pastwords" class="text ui-widget-content ui-corner-all"/>
+            </div>
+            <div id="aro-form-slider-pastwords">
 	</fieldset>
     </form>
 </div>
