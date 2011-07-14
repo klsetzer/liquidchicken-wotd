@@ -31,6 +31,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 <!-- Included css and js {{{2 -->
 <!-- This mess needs to be fixed.  The order is very sensitive and can cause problems. -->
 <script src="http://www.google.com/jsapi" type="text/javascript"></script>
+<script type="text/javascript" src="date-js/date-en-US.js"></script>
 <script type="text/javascript">
 google.load("jquery", "1.6.2");
 google.load("gdata", "2.x", {packages: ["calendar"]}); // Load the Google jsapi
@@ -75,7 +76,7 @@ var maxResults = 3652;
 var maxTableWidth = 10; // wotd history table can be no wider than 10 cells
 var itemsThreshold = 0; // More than this, and we make a table
 // Encourage table into shape more conducive to words that are much wider than taller, e.g. 'hemidemisemiquaver'
-// For every 9 x (cols) there should be about 25 y (rows);
+// For every 9 x (cols) there should be about 32 y (rows);
 var aspectRatioAdjust = 9 / 32;
 
 function wotdHistory (entries) {
@@ -146,15 +147,13 @@ function wotdHistory (entries) {
 function callback (result) {
     var entries = result.feed.getEntries();
     var numItems = 1;
-
-    wotdHistory(entries.slice(0,numItems));
     var timer = setInterval(function() {
-        numItems++;
         wotdHistory(entries.slice(0,numItems));
-        if (numItems >= entries.length) {
+        if (numItems > entries.length + 1) {
             clearInterval(timer);
         }
-        }, 95);
+        numItems++;
+    }, 4);
 };
     
 // Error handler to be invoked when getEventsFeed() produces an error
@@ -165,8 +164,8 @@ var handleError = function (error) {
 function _run() {
     var calendarService = new google.gdata.calendar.CalendarService('LiquidChicken-wotdDisplayer-1.0');
     var query = new google.gdata.calendar.CalendarEventQuery(feedUrl);
-    query.setOrderBy('starttime');
-    query.setSortOrder('descending');
+//    var maxDate = new google.gdata.DateTime(Date.today().add({years: 1}));
+//    query.setMaximumStartTime(maxDate);
     query.setMaxResults(maxResults);
     calendarService.getEventsFeed(query, callback, handleError);
 }

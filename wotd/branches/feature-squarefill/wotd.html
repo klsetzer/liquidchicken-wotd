@@ -192,10 +192,10 @@ var handleError = function (error) {
 function _run() {
     var calendarService = new google.gdata.calendar.CalendarService('LiquidChicken-wotdDisplayer-1.0');
     var query = new google.gdata.calendar.CalendarEventQuery(feedUrl);
-    query.setOrderBy('starttime');
-    query.setSortOrder('descending');
-    var maxDate = new google.gdata.DateTime(Date.today());
-    query.setMaximumStartTime(maxDate);
+//    query.setOrderBy('starttime');
+//    query.setSortOrder('descending');
+//    var maxDate = new google.gdata.DateTime(Date.today().add({years: 1}));
+//    query.setMaximumStartTime(maxDate);
     query.setMaxResults(maxResults); // Keep us out of trouble
     calendarService.getEventsFeed(query, callback, handleError);
 }
