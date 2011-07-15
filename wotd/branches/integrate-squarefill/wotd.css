@@ -37,3 +37,4 @@ html, body  {
     
 img         { margin: 2px 2px; }
 fieldset    { border:none; }
+table       { border:1px solid gray; }
