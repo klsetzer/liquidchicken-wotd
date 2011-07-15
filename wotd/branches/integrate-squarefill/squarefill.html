@@ -74,58 +74,38 @@ $.fn.textfill = function(options) {
 var feedUrl = "https://www.google.com/calendar/feeds/u6g675oejpdha4pncv50rmi8tc%40group.calendar.google.com/public/full";
 var maxResults = 3652;
 var maxTableWidth = 10; // wotd history table can be no wider than 10 cells
-var itemsThreshold = 0; // More than this, and we make a table
-// Encourage table into shape more conducive to words that are much wider than taller, e.g. 'hemidemisemiquaver'
-// For every 9 x (cols) there should be about 32 y (rows);
-var aspectRatioAdjust = 9 / 32;
+var itemsThreshold = 4; // More than this, and we make a table
+// Encourage table into shape more conducive to words that are much, much wider than taller, e.g. 'hemidemisemiquaver'
+var aspectRatioAdjust = 9 / 80;
 
 function wotdHistory (entries) {
-    function tableXY(numItems,aspectRatio) {
-        var x = 1; var y = 1;
-        do {
-            if ((x/y) > aspectRatio) {
-                y++;
-            } else {
-                x++;
-                y = Math.ceil(y * aspectRatio);
-            }
-        } while((x * y) < numItems);
-        return {x:x,y:y};
-    }
-
-    function tableWords(entries) {
-        var tableDim = Math.ceil(Math.sqrt(entries.length));
+    var numItems = entries.length;
+    if (numItems > itemsThreshold) { // Put these in a table
         var tt = '';
         var k = 0;
-        // Construct empty table
-        for (var i=0; i < dim.y; i++) {
+        // Calculate table dimensions
+        y = Math.ceil(numItems * aspectRatioAdjust);
+        x = Math.ceil(numItems / y);
+
+        // Construct table
+        table_loop:
+        for (var i=0; i < y; i++) {
             tt = tt + "<tr>";
-            for (var j = 0; j < dim.x; j++) {
-                tt = tt + '<td><div id="cell_' + k + '">' + i + '/' + j + '</div></td>';
+            for (var j = 0; j < x; j++) {
+                if (k >= numItems) {
+                    break;
+                }
+                tt = tt + '<td>' + entries[k].getTitle().getText() + '</td>';
                 k++;
             }
             tt = tt + "</tr>";
+            if (k >= numItems) { 
+                break;
+            }
         }
         // Add the table to the DOM
         $('.wotd-history-table > tbody:last').replaceWith('<tbody><tr></tr>' + tt + '</tbody>');
-
-        // Populate table cells
-        $.each(rawWords(entries), function(index,word) {
-            $('#cell_' + index).replaceWith(word);
-        });
-
-        // Add some stats
-        $("#stats").replaceWith('<div id="stats" class="tinyItem">words: ' + entries.length + ' x: ' + dim.x + ' y: ' + dim.y);
-    }
-    function rawWords(entries) {
-        var w = [];
-        $.each(entries, function(index,word) {
-            w.push(word.getTitle().getText());
-        });
-        return w.sort();
-    }
-
-    function simpleWords (entries) {
+    } else { // No table, just display simply
         var pastWords = [];
         $.each(entries, function(index,word) {
             pastWords.push(word.getTitle().getText() + '<br/>');
@@ -133,27 +113,21 @@ function wotdHistory (entries) {
         $('#goo').replaceWith('<div class="textfill"><div id="subject"><span>' + pastWords.join('') + '</span></div></div><div id="footer">Previous Words of the Day</div>');
     }
 
-    var wc = entries.length;
-    var dim = tableXY(wc,aspectRatioAdjust);
-
-    if (wc > itemsThreshold) {
-        tableWords(entries);
-    } else {
-        simpleWords(entries);
-    }
-
 }
 
 function callback (result) {
     var entries = result.feed.getEntries();
-    var numItems = 1;
+    var numItems = 9;
+    wotdHistory(entries.slice(0,numItems));
+/*
     var timer = setInterval(function() {
         wotdHistory(entries.slice(0,numItems));
         if (numItems > entries.length + 1) {
             clearInterval(timer);
         }
         numItems++;
-    }, 4);
+    }, 1);
+*/
 };
     
 // Error handler to be invoked when getEventsFeed() produces an error
