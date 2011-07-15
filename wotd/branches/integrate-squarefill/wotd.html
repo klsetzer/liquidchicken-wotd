@@ -64,18 +64,19 @@ google.load("gdata", "2.x", {packages: ["calendar"]}); // Load the Google jsapi
 <!-- Included css and js }}} -->
 <!-- jQuery textFill {{{2 -->
 <script>
-$.fn.textfill = function(options) {
+$.fn.textfill = function(options,widthAdjust) {
     var defaults = {
         minFontPixels: 16,
         maxFontPixels: 144,
         fontIncrement: 8,
-        innerTag: 'span'
+        innerTag: 'span',
+        widthAdjust: 1,
     };
     var Opts = jQuery.extend(defaults, options);
     return this.each(function() {
         var fontSize = Opts.minFontPixels;
         var ourText = $(Opts.innerTag + ':visible:first', this);
-        var maxHeight = $(this).height();
+        var maxHeight = $(this).height() * Opts.widthAdjust;
         var maxWidth = $(this).width();
         var textHeight;
         var textWidth;
@@ -93,19 +94,19 @@ $.fn.textfill = function(options) {
 <script>
 var wotdPanels = [];
 var wotdCurrentPanel = 0;
-var dwellTime = 1222;
+var dwellTime = 2222;
 var fadeTime = 500;
 var maxResults = 3652; // 10 years worth of results, counting leap years
-var previousCount = 4;
+var previousCount = 18;
 var timer;
 var feedUrl = "https://www.google.com/calendar/feeds/u6g675oejpdha4pncv50rmi8tc%40group.calendar.google.com/public/basic";
 var feedUrltotd  = "https://www.google.com/calendar/feeds/te8k0626iqt47ah82242on0mk0%40group.calendar.google.com/public/basic";
 // Settings for Previous WOTD
 var maxTableWidth = 10; // wotd history table can be no wider than 10 cells
-var itemsThreshold = 3; // More than this, and we make a table
+var itemsThreshold = 4; // More than this, and we make a table
 // Encourage table into shape more conducive to words that are much wider than taller, e.g. 'hemidemisemiquaver'
 // For every 9 x (cols) there should be 32 y (rows);
-var aspectRatioAdjust = 9 / 32;
+var aspectRatioAdjust = 9 / 50;
 
 // Only run these once
 var __LOADED_postLoadInit = 0;
@@ -125,7 +126,8 @@ function switchFade() {
 
 function showPanel() {
     $('div#display').replaceWith(wotdPanels[wotdCurrentPanel]);
-    $('.textfill').textfill({ innerTag: 'span', maxFontPixels: 288, });
+    // widthAdjust is not working
+    $('.textfill').textfill({ innerTag: 'span', maxFontPixels: 288, widthAdjust:.6, });
     timer = setTimeout(switchFade,dwellTime); 
 }
 
@@ -169,10 +171,10 @@ function wotdHistory (entries) {
 function makePanels(entries) {
     var eventTitle = entries[0].getTitle().getText();
     var panels = [];
-    panels.push('<div id="display"><div class="textfill" id="subject">' + entries[0].getTitle().getText() + '</div><div id="footer">Word of the Day</div></div>');
+    panels.push('<div id="display" class="centered"><div id="subject" class="textfill"><span>' + entries[0].getTitle().getText() + '</span></div><div id="footer">Word of the Day</div></div>');
 
     var pastWords = wotdHistory(entries.slice(1,previousCount + 1));
-    panels.push('<div id="display"><div id="subject">' + pastWords + '</div><div id="footer">Previous Words of the Day</div></div>');
+    panels.push('<div id="display" class="centered"><div id="subject" class="textfill"><span>' + pastWords + '</span></div><div id="footer">Previous Words of the Day</div></div>');
     return(panels);
 }
 
@@ -192,7 +194,6 @@ function postLoadInit () {
                 feedUrl = $( '#aro-form-input-source' ).val();
                 dwellTime = $( '#aro-form-input-dwell').val() * 1000;
                 fadeTime = $( '#aro-form-input-fade').val() * 1000;
-                _run();
             }, 
             "Cancel": function() { 
                 $(this).dialog("close"); 
@@ -209,7 +210,7 @@ function postLoadInit () {
     $( "#aro-form-slider-pastwords" ).slider({
         range: "max",
         min: 1,
-        max: 33,
+        max: 200,
         value: previousCount,
         slide: function( event, ui ) {
             $( "#aro-form-textbox-pastwords" ).val( ui.value );
@@ -260,8 +261,8 @@ google.setOnLoadCallback(_run);
         <img id="btn_info"     src="images/Info-UI-48.png" width="48" height="48"/>
     </div>
     <div id="display">
-        <div class="textfill"><div id="subject"><span></span></div></div>
-        <div id="footer"/>
+        <div id="subject" class="textfill"><span></span></div>
+        <div id="footer" />
     </div>
 </div>
 
