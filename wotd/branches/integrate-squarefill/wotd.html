@@ -101,16 +101,13 @@ var previousCount = 18;
 var timer;
 var feedUrl = "https://www.google.com/calendar/feeds/u6g675oejpdha4pncv50rmi8tc%40group.calendar.google.com/public/basic";
 var feedUrltotd  = "https://www.google.com/calendar/feeds/te8k0626iqt47ah82242on0mk0%40group.calendar.google.com/public/basic";
-<<<<<<< .working
 // Settings for Previous WOTD
 var maxTableWidth = 10; // wotd history table can be no wider than 10 cells
 var itemsThreshold = 4; // More than this, and we make a table
 // Encourage table into shape more conducive to words that are much wider than taller, e.g. 'hemidemisemiquaver'
 // For every 9 x (cols) there should be 32 y (rows);
 var aspectRatioAdjust = 9 / 50;
-=======
 var runState = "running";
->>>>>>> .merge-right.r72
 
 // Only run these once
 var __LOADED_postLoadInit = 0;
@@ -198,10 +195,6 @@ function postLoadInit () {
                 feedUrl = $( '#aro-form-input-source' ).val();
                 dwellTime = $( '#aro-form-input-dwell').val() * 1000;
                 fadeTime = $( '#aro-form-input-fade').val() * 1000;
-<<<<<<< .working
-=======
-//                _run();
->>>>>>> .merge-right.r72
             }, 
             "Cancel": function() { 
                 $(this).dialog("close"); 
@@ -279,15 +272,9 @@ google.setOnLoadCallback(_run);
         <div class="fadeAble" id="btn-calendar"><img id="img-calendar" src="images/Calendar-UI-48.png" width="48" height="48"></div>
         <div class="fadeAble" id="btn-startstop"><img id="img-startstop" src="images/Stop-UI-48.png" width="48" height="48"></div> 
     </div>
-<<<<<<< .working
     <div id="display">
         <div id="subject" class="textfill"><span></span></div>
         <div id="footer" />
-=======
-    <div class="display">
-        <div class="textfill" id="subject"><span></span></div>
-        <div id="footer"/>
->>>>>>> .merge-right.r72
     </div>
 </div>
 
