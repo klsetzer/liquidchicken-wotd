@@ -99,6 +99,7 @@ var fadeTime = 500;
 var timer;
 var feedUrl = "https://www.google.com/calendar/feeds/u6g675oejpdha4pncv50rmi8tc%40group.calendar.google.com/public/basic";
 var feedUrltotd  = "https://www.google.com/calendar/feeds/te8k0626iqt47ah82242on0mk0%40group.calendar.google.com/public/basic";
+var runState = "running";
 
 var maxResults = 3652; // 10 years worth of results, counting leap years
 var previousCount = 4;
@@ -154,7 +155,7 @@ function postLoadInit () {
                 feedUrl = $( '#aro-form-input-source' ).val();
                 dwellTime = $( '#aro-form-input-dwell').val() * 1000;
                 fadeTime = $( '#aro-form-input-fade').val() * 1000;
-                _run();
+//                _run();
             }, 
             "Cancel": function() { 
                 $(this).dialog("close"); 
@@ -163,15 +164,14 @@ function postLoadInit () {
     }).removeClass('hidden'); // It starts off hidden so that you can't see it during the chains of callbacks, so show it.
     $('#btn-config').click(function() { $('#dialog-form').dialog('open'); return false; });
     $('#btn-calendar').click(function() { window.open('https://www.google.com/calendar/embed?src=u6g675oejpdha4pncv50rmi8tc%40group.calendar.google.com&ctz=America/Chicago', "googCal")});
-    var runState = "running";
-    $('#btn-stopstart').click(function() {
+    $('#btn-startstop').click(function() {
         if (runState == "running") {
             runState = "stopped";
-            $('#img-startstop').replaceWith('<img src="images/Video-Play-UI-48.png" width="48" height="48" />');
+            $('#img-startstop').replaceWith('<img id="img-startstop" src="images/Video-Play-UI-48.png" width="48" height="48" />');
             clearTimeout(timer);
         } else {
             runState = "running";
-            $('#img-startstop').replaceWith('<img src="images/Stop-UI-48.png" width="48" height="48" />');
+            $('#img-startstop').replaceWith('<img id="img-startstop" src="images/Stop-UI-48.png" width="48" height="48" />');
             timer = setTimeout(switchFade,dwellTime); 
         }
 
@@ -195,10 +195,10 @@ function postLoadInit () {
 }
 
 function callback (result) {
-    var entries = result.feed.getEntries();
-    wotdPanels = makePanels(entries);
-    // Get things going with the roller
     $(function() {
+        var entries = result.feed.getEntries();
+        wotdPanels = makePanels(entries);
+        // Get things going with the roller
         postLoadInit();
         showPanel(); // Get started with first panel
     });
@@ -231,7 +231,7 @@ google.setOnLoadCallback(_run);
     <div id="buttonbar-bottom">
         <div class="fadeAble" id="btn-config"><img id="img-config" src="images/Gear-UI-48.png" width="48" height="48"></div>
         <div class="fadeAble" id="btn-calendar"><img id="img-calendar" src="images/Calendar-UI-48.png" width="48" height="48"></div>
-        <div class="fadeAble" id="btn-stopstart"><img id="img-startstop" src="images/Stop-UI-48.png" width="48" height="48"></div> 
+        <div class="fadeAble" id="btn-startstop"><img id="img-startstop" src="images/Stop-UI-48.png" width="48" height="48"></div> 
     </div>
     <div class="display">
         <div class="textfill" id="subject"><span></span></div>
