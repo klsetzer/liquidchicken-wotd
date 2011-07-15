@@ -76,7 +76,7 @@ $.fn.textfill = function(options,widthAdjust) {
     return this.each(function() {
         var fontSize = Opts.minFontPixels;
         var ourText = $(Opts.innerTag + ':visible:first', this);
-        var maxHeight = $(this).height() * Opts.widthAdjust;
+        var maxHeight = $(this).height();
         var maxWidth = $(this).width();
         var textHeight;
         var textWidth;
@@ -107,7 +107,7 @@ var itemsThreshold = 4; // More than this, and we make a table
 // Encourage table into shape more conducive to words that are much wider than taller, e.g. 'hemidemisemiquaver'
 // For every 9 x (cols) there should be 32 y (rows);
 var aspectRatioAdjust = 9 / 50;
-var runState = "running";
+var runState = "running";  // Are we stopped or running?
 
 // Only run these once
 var __LOADED_postLoadInit = 0;
@@ -127,8 +127,7 @@ function switchFade() {
 
 function showPanel() {
     $('div#display').replaceWith(wotdPanels[wotdCurrentPanel]);
-    // widthAdjust is not working
-    $('.textfill').textfill({ innerTag: 'span', maxFontPixels: 288, widthAdjust:.6, });
+    $('.textfill').textfill({ innerTag: 'span', maxFontPixels: 288, });
     timer = setTimeout(switchFade,dwellTime); 
 }
 
@@ -158,7 +157,7 @@ function wotdHistory (entries) {
             }
         }
         // Add the table to the DOM
-        return ('<table><tbody><tr></tr>' + tt + '</tbody></table>');
+        return ('<table class="centered"><tbody><tr></tr>' + tt + '</tbody></table>');
     } else { // No table, just display simply
         var words = "";
         $.each(entries, function(index,word) {
