@@ -70,7 +70,29 @@ $.fn.textfill = function(options,widthAdjust) {
         maxFontPixels: 144,
         fontIncrement: 8,
         innerTag: 'span',
-        widthAdjust: 1,
+    };
+    var Opts = jQuery.extend(defaults, options);
+    return this.each(function() {
+        var fontSize = Opts.minFontPixels;
+        var ourText = $(Opts.innerTag + ':visible:first', this);
+        var maxHeight = $(this).height();
+        var maxWidth = $(this).width();
+        var textHeight;
+        var textWidth;
+        do {
+            ourText.css('font-size', fontSize);
+            textHeight = ourText.height();
+            textWidth = ourText.width();
+            fontSize = fontSize + Opts.fontIncrement;
+        } while ((textHeight < maxHeight) && (textWidth < maxWidth) && (fontSize <= Opts.maxFontPixels));
+    });
+};
+$.fn.texttablefill = function(options,widthAdjust) {
+    var defaults = {
+        minFontPixels: 16,
+        maxFontPixels: 144,
+        fontIncrement: 8,
+        innerTag: 'span',
     };
     var Opts = jQuery.extend(defaults, options);
     return this.each(function() {
@@ -92,6 +114,7 @@ $.fn.textfill = function(options,widthAdjust) {
 <!-- jQuery textFill }}} -->
 <!-- Main JavaScript {{{ -->
 <script>
+<!-- Defaults {{{3 -->
 var wotdPanels = [];
 var wotdCurrentPanel = 0;
 var dwellTime = 2222;
@@ -108,29 +131,9 @@ var itemsThreshold = 4; // More than this, and we make a table
 // For every 9 x (cols) there should be 32 y (rows);
 var aspectRatioAdjust = 9 / 50;
 var runState = "running";  // Are we stopped or running?
-
-// Only run these once
-var __LOADED_postLoadInit = 0;
-
-function switchFade() {
-    wotdCurrentPanel++;
-    $('div#display').fadeOut(fadeTime,function(){
-        if(wotdCurrentPanel >= wotdPanels.length) {
-            wotdCurrentPanel = 0;
-            clearTimeout(timer);
-            _run();
-        } else {
-            showPanel();
-        }
-    });
-}
-
-function showPanel() {
-    $('div#display').replaceWith(wotdPanels[wotdCurrentPanel]);
-    $('.textfill').textfill({ innerTag: 'span', maxFontPixels: 288, });
-    timer = setTimeout(switchFade,dwellTime); 
-}
-
+var __LOADED_postLoadInit = 0; // Only run this once
+<!-- Defaults }}} -->
+<!-- wotdHistory() {{{3 -->
 function wotdHistory (entries) {
     var numItems = entries.length;
     if (numItems > itemsThreshold) { // Put these in a table
@@ -157,7 +160,7 @@ function wotdHistory (entries) {
             }
         }
         // Add the table to the DOM
-        return ('<table class="centered"><tbody><tr></tr>' + tt + '</tbody></table>');
+        return ('<table class="centered topalign"><tbody><tr></tr>' + tt + '</tbody></table>');
     } else { // No table, just display simply
         var words = "";
         $.each(entries, function(index,word) {
@@ -167,17 +170,8 @@ function wotdHistory (entries) {
     }
 
 }
-
-function makePanels(entries) {
-    var eventTitle = entries[0].getTitle().getText();
-    var panels = [];
-    panels.push('<div id="display" class="centered"><div id="subject" class="textfill"><span>' + entries[0].getTitle().getText() + '</span></div><div id="footer">Word of the Day</div></div>');
-
-    var pastWords = wotdHistory(entries.slice(1,previousCount + 1));
-    panels.push('<div id="display" class="centered"><div id="subject" class="textfill"><span>' + pastWords + '</span></div><div id="footer">Previous Words of the Day</div></div>');
-    return(panels);
-}
-
+<!-- wotdHistory() }}} -->
+<!-- postLoadInit() {{{3 -->
 function postLoadInit () {
     if (__LOADED_postLoadInit != 0) {
         return true;
@@ -231,13 +225,43 @@ function postLoadInit () {
 
     $( "#aro-form-textbox-pastwords" ).val( $( "#aro-form-slider-pastwords" ).slider( "value" ) );
 }
+<!-- postLoadInit() }}} -->
+
+function makePanels(entries) {
+    var panels = [];
+
+    // wotd
+    panels.push('<div id="display"><div id="subject" class="textfill"><span>' + entries[0].getTitle().getText() + '</span></div><div id="footer">Word of the Day</div></div>');
+
+    var pastWords = wotdHistory(entries.slice(1,previousCount + 1));
+    panels.push('<div id="display"><div id="subject">' + pastWords + '</div><div id="footer">Previous Words of the Day</div></div>');
+    return(panels);
+}
+
+function switchFade() {
+    wotdCurrentPanel++;
+    $('div#display').fadeOut(fadeTime,function(){
+        if(wotdCurrentPanel >= wotdPanels.length) {
+            wotdCurrentPanel = 0;
+            clearTimeout(timer);
+            _run();
+        } else {
+            showPanel();
+        }
+    });
+}
+
+function showPanel() {
+    $('div#display').replaceWith(wotdPanels[wotdCurrentPanel]);
+    $('.textfill').textfill({ innerTag: 'span', maxFontPixels: 432, });
+    timer = setTimeout(switchFade,dwellTime); 
+}
 
 function callback (result) {
     $(function() {
+        postLoadInit();
         var entries = result.feed.getEntries();
         wotdPanels = makePanels(entries);
-        // Get things going with the roller
-        postLoadInit();
         showPanel(); // Get started with first panel
     });
 };
