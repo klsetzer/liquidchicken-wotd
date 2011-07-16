@@ -147,15 +147,12 @@ function postLoadInit () {
         autoOpen: false,
         title: 'Announcement Options',
         modal: true,
-        // open: function() { clearTimeout(timer) },
-        // close: function() { timer = setTimeout(switchFade,dwellTime) },
         buttons: {
             "Ok": function() { 
                 $(this).dialog("close"); 
                 feedUrl = $( '#aro-form-input-source' ).val();
                 dwellTime = $( '#aro-form-input-dwell').val() * 1000;
                 fadeTime = $( '#aro-form-input-fade').val() * 1000;
-//                _run();
             }, 
             "Cancel": function() { 
                 $(this).dialog("close"); 
