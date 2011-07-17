@@ -1,21 +1,15 @@
-#summary LiquidChicken Word of the Day Roller
+#summary Word of the Day Display
 
-= Introduction =
-The LiquidChicken Word of the Day Roller polls a Google calendar for current and past words and displays them in a kiosk/billboard fashion.
+== Introduction ==
+The LiquidChicken Word of the Day Roller polls a Google calendar for current and past words and displays them in a billboard fashion.
 
-
-= Details =
-
-No Details
-
-= To Do List =
-== Features ==
+== ToDoList ==
   * Update calendar icon with today's date
   * Add "make link" button that displays a save-able URL
   * Options dialog layout improvement
   * Add word dialog
 
-== Wish List ==
+== BlueSkyFeatures ==
   * multiple sources/panel types
     * Panel Types: wotd, previous, qotd, announcement
   * handle multiple events per day
