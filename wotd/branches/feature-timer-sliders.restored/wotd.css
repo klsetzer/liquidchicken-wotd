@@ -40,6 +40,13 @@ html, body  {
 img         { margin: 2px 2px; }
 fieldset    { border:none; }
 
+/* Form styling */
+#aro-form { width:100%; }
+.form-labels { float:left; }
+.form-indicators {margin-left:100px; }
+.form-controls { float:right; }
+
+
 /* date button stuff */
 #btn-calendar { position: relative; width:100%; }
 #date-text {
