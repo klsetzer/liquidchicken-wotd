@@ -253,7 +253,7 @@ google.setOnLoadCallback(_run);
 
         <div class="fadeAble" id="btn-calendar">
             <img id="img-calendar" src="images/_blank-Calendar-UI-48.png" width="48" height="48">
-            <div id="date-text"><span id="today" /></div>
+            <div id="date-text"><span id="today"></span></div>
         </div>
     </div>
     <div class="display">
@@ -264,27 +264,37 @@ google.setOnLoadCallback(_run);
 
 <div class="hidden" id="dialog-form" title="Announcement Options">
     <form id="aro-form">
-    <br />
     <fieldset>
-        <div class="form-labels">
-            <label for="aro-form-textbox-dwell">Dwell Time</label> <br />
-            <label for="aro-form-textbox-fade">Fade Time</label> <br />
-            <label for="aro-form-textbox-pastwords">Past Words</label> <br />
+        <div class="form-element">
+            <label for="aro-form-textbox-dwell" class="ui-corner-all">Dwell Time</label>
+            <div id="form-dwell" class="form-element-box ui-corner-all">
+                <input type="text" size="5" id="aro-form-textbox-dwell" class="ui-widget-content ui-corner-all">&nbsp;s
+                <div id="aro-form-slider-dwell" class="slider"></div>
+            </div>
         </div>
-        <div class="form-indicators">
-            <input type="text" size="5" id="aro-form-textbox-dwell" class="form-indicators text ui-widget-content ui-corner-all" />&nbsp;s <br />
-            <input type="text" size="5" id="aro-form-textbox-fade" class="form-indicators text ui-widget-content ui-corner-all" />&nbsp;s <br />
-            <input type="text" size="3" id="aro-form-textbox-pastwords" class="form-indicators text ui-widget-content ui-corner-all"/> <br />
-        </div>
-        <div class="form-xcontrols">
-            <div id="aro-form-slider-dwell" /> <br />
-            <div id="aro-form-slider-fade" /> <br />
-            <div id="aro-form-slider-pastwords" /> <br />
-        </div>
-        <br />
 
-		<label for="aro-form-textarea-source">Word Source</label>
-		<textarea rows="2" cols="80" name="wordSource" id="aro-form-textarea-source" class="text ui-widget-content ui-corner-all"/>
+        <div class="form-element">
+            <label for="aro-form-textbox-fade" class="ui-corner-all">Fade Time</label>
+            <div id="form-fade" class="form-element-box ui-corner-all">
+                <input type="text" size="5" id="aro-form-textbox-fade" class="ui-widget-content ui-corner-all">&nbsp;s
+                <div id="aro-form-slider-fade" class="slider"></div>
+            </div>
+        </div>
+
+        <div class="form-element">
+            <label for="aro-form-textbox-pastwords" class="ui-corner-all">Past Words</label>
+             <div id="form-pastwords" class="form-element-box ui-corner-all">
+                <input type="text" size="3" id="aro-form-textbox-pastwords" class="ui-widget-content ui-corner-all">
+                <div id="aro-form-slider-pastwords" class="slider"></div>
+            </div>
+        </div>
+
+        <div class="form-element">
+            <label for="aro-form-textarea-source" class="ui-corner-all">Word Source</label>
+            <div id="form-source" class="form-element-box ui-corner-all">
+                <textarea id="aro-form-textarea-source" class="ui-widget-content ui-corner-all"></textarea>
+            </div>
+        </div>
 	</fieldset>
     </form>
 </div>
