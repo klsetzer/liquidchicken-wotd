@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+<head>
+    <title>Word of the Day</title>
+<!-- Included css and js {{{ -->
+<!-- This mess needs to be fixed.  The order is very sensitive and can cause problems. -->
+<script src="http://www.google.com/jsapi" type="text/javascript"></script>
+<script type="text/javascript">
+google.load("jquery", "1.6.2");
+google.load("gdata", "2.x", {packages: ["calendar"]}); // Load the Google jsapi
+</script>
+
+<link type="text/css" href="jquery-ui/css/custom-theme/jquery-ui-1.8.14.custom.css" rel="stylesheet" />
+<link type="text/css" href="calimg.css" rel="stylesheet" />
+<link type="text/css" href="opacity-itnewb.css" rel="stylesheet" />
+<script type="text/javascript" src="jquery-ui/js/jquery-ui-1.8.14.custom.min.js"></script>
+<script type="text/javascript" src="date-js/date-en-US.js"></script>
+<!-- Included css and js }}} -->
+<!-- Main JavaScript {{{ -->
+<script>
+
+var Today = 1;
+function newdate() {
+    $('#today').replaceWith('<span id="today">' + Today + '</span>');
+    Today++;
+    if(Today > 31) {
+        Today = 1;
+    }
+    setTimeout(newdate,333);
+}
+
+function _run() {
+    $(function() {
+        newdate();
+    });
+}
+
+google.setOnLoadCallback(_run);
+
+</script>
+<!-- Main JavaScript }}} -->
+</head>
+<!-- HTML: Body {{{1 -->
+<body>
+    <div class="fadeAble" id="btn-calendar">
+        <img id="img-calendar" src="images/days/_blank-Calendar-UI-48.png" width="48" height="48">
+        <div id="date-text"><span id="today">boo<span class="date-spacer" /></span></div>
+    </div>
+
+
+</body>
+<!-- HTML: Body }}} -->
+</html>
