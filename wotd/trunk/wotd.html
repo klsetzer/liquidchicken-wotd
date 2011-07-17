@@ -189,6 +189,12 @@ function postLoadInit () {
     });
 
     $( "#aro-form-textbox-pastwords" ).val( $( "#aro-form-slider-pastwords" ).slider( "value" ) );
+
+    
+    // Set today's date for the calendar icon
+    var Today = Date.today().toString('dd');
+     $('#today').replaceWith('<span id="today">' + Today + '</span>');
+
 }
 
 function callback (result) {
@@ -227,7 +233,12 @@ google.setOnLoadCallback(_run);
 <div id="container">
     <div id="buttonbar-bottom">
         <div class="fadeAble" id="btn-config"><img id="img-config" src="images/Gear-UI-48.png" width="48" height="48"></div>
-        <div class="fadeAble" id="btn-calendar"><img id="img-calendar" src="images/Calendar-UI-48.png" width="48" height="48"></div>
+
+        <div class="fadeAble" id="btn-calendar">
+            <img id="img-calendar" src="images/days/_blank-Calendar-UI-48.png" width="48" height="48">
+            <div id="date-text"><span id="today"></span></div>
+        </div>
+
         <div class="fadeAble" id="btn-startstop"><img id="img-startstop" src="images/Stop-UI-48.png" width="48" height="48"></div> 
     </div>
     <div class="display">
