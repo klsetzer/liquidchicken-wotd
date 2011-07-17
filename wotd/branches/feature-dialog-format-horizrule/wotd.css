@@ -41,13 +41,13 @@ fieldset    { border:0px solid white; margin-top:22px;}
 
 /* Form styling */
 /* #aro-form { border:1px solid white;} */
-.form-element {margin-bottom:48px;}
-label   {float:left; margin-left:24px; margin-top:-12px; border:1px solid gray; padding: 2px 8px; background-image:url(jquery-ui/css/custom-theme/images/ui-bg_flat_0_000000_40x100.png);}
+.form-element {margin-bottom:48px; border-top:1px dotted gray;}
+label   {float:left; margin-left:15px; margin-top:-15px; padding: 2px 6px 3px; background-image:url(jquery-ui/css/custom-theme/images/ui-bg_flat_0_000000_40x100.png);}
 .slider {margin:0px 15px 15px 24px;}
-#form-dwell { border:1px dotted gray; }
-#form-fade { border:1px dotted gray; }
-#form-pastwords { border:1px dotted gray; }
-#form-source { border:1px dotted gray; }
+#form-dwell label{ border:1px solid #880000; }
+#form-fade label{ border:1px solid #005500; }
+#form-pastwords label{ border:1px solid #000099; }
+#form-source label{ border:1px solid #880088; }
 .ui-widget-content textarea {border:none; height:40px; width:900; max-height:40px; max-width:900;}
 
 

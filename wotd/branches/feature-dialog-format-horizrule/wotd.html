@@ -66,7 +66,7 @@ google.load("gdata", "2.x", {packages: ["calendar"]}); // Load the Google jsapi
 <script>
 $.fn.textfill = function(options) {
     var defaults = {
-        minFontPixels: 16,
+        minFontPixels: 10,
         maxFontPixels: 144,
         fontIncrement: 8,
         innerTag: 'span'
@@ -146,7 +146,7 @@ function postLoadInit () {
     // Instantiate Options Dialog
     $('#dialog-form').dialog({
         autoOpen: false,
-        title: 'Announcement Options',
+        title: 'Options',
         modal: true,
         minWidth: 1024,
         minHeight: 400,
@@ -156,7 +156,7 @@ function postLoadInit () {
                 feedUrl = $( '#aro-form-textarea-source' ).val();
                 dwellTime = $( '#aro-form-textbox-dwell').val() * 1000;
                 fadeTime = $( '#aro-form-textbox-fade').val() * 1000;
-                previousCount = $('#aro-form-textbox-pastwords').val;
+                previousCount = $('#aro-form-textbox-pastwords').val();
                 clearTimeout(timer);
                 timer = setTimeout(switchFade,dwellTime); 
             }, 
@@ -265,33 +265,33 @@ google.setOnLoadCallback(_run);
 <div class="hidden" id="dialog-form" title="Announcement Options">
     <form id="aro-form">
     <fieldset>
-        <div class="form-element">
+        <div id="form-dwell" class="form-element">
             <label for="aro-form-textbox-dwell" class="ui-corner-all">Dwell Time</label>
-            <div id="form-dwell" class="form-element-box ui-corner-all">
+            <div class="ui-corner-all">
                 <input type="text" size="5" id="aro-form-textbox-dwell" class="ui-widget-content ui-corner-all">&nbsp;s
                 <div id="aro-form-slider-dwell" class="slider"></div>
             </div>
         </div>
 
-        <div class="form-element">
+        <div id="form-fade" class="form-element">
             <label for="aro-form-textbox-fade" class="ui-corner-all">Fade Time</label>
-            <div id="form-fade" class="form-element-box ui-corner-all">
+            <div class="ui-corner-all">
                 <input type="text" size="5" id="aro-form-textbox-fade" class="ui-widget-content ui-corner-all">&nbsp;s
                 <div id="aro-form-slider-fade" class="slider"></div>
             </div>
         </div>
 
-        <div class="form-element">
+        <div id="form-pastwords" class="form-element">
             <label for="aro-form-textbox-pastwords" class="ui-corner-all">Past Words</label>
-             <div id="form-pastwords" class="form-element-box ui-corner-all">
+             <div class="ui-corner-all">
                 <input type="text" size="3" id="aro-form-textbox-pastwords" class="ui-widget-content ui-corner-all">
                 <div id="aro-form-slider-pastwords" class="slider"></div>
             </div>
         </div>
 
-        <div class="form-element">
+        <div id="form-source" class="form-element">
             <label for="aro-form-textarea-source" class="ui-corner-all">Word Source</label>
-            <div id="form-source" class="form-element-box ui-corner-all">
+            <div class="ui-corner-all">
                 <textarea id="aro-form-textarea-source" class="ui-widget-content ui-corner-all"></textarea>
             </div>
         </div>
