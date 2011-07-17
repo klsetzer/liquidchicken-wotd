@@ -1,0 +1,304 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+<head>
+    <title>Word of the Day</title>
+<!-- LICENSE {{{
+Copyright (c) 2011 Kelly Setzer 
+
+This work is licensed under the MIT License
+(http://www.opensource.org/licenses/mit-license.php).  Some libraries, images,
+and other included works may be separately licensed.  See attribution or source
+of those works for licensing terms.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+ADDITIONAL LICENSES
+    * Retina Display icons by The Working Group, http://www.theworkinggroup.ca
+        licensed under CC Attribution Non-Commercial Share Alike (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+        http://www.iconspedia.com/pack/retina-display-icons-3346/
+    * jQuery Javascript Library (c) 2010 The jQuery Project
+        licensed under the MIT License
+    * jQueryUI Javascript Library (c) 2010 The jQuery Project
+        licensed under the MIT License
+    * Date.js [date-en-US.js] JavaScript Date Library (c) 2006-2010, Coolite Inc. All rights reserved.
+        licensed under the MIT License
+    * jquery-textfill-0.1.js (c) Russ Painter WebDesign@GeekyMonkey.com
+        no known license
+    * Google API license(s) and TOS may apply, but I really can't tell.  No
+      Google intellectual property is directly included in this work, although
+      it is dependent on the Google jsapi and on various Google services.
+
+}}} -->
+<!-- Google jsapi with key {{{
+<script src="http://www.google.com/jsapi?key=ABQIAAAANU8OAqbJPAHXV4SpKuTEvhQx6TWrfC8bNfnC-vtzzHJYkwhD6xSt50-Z_44EojojRLDiBj3kn932Rw" type="text/javascript"></script>
+}}} -->
+<!-- Included css and js {{{ -->
+<!-- This mess needs to be fixed.  The order is very sensitive and can cause problems. -->
+<script src="http://www.google.com/jsapi" type="text/javascript"></script>
+<script type="text/javascript">
+google.load("jquery", "1.6.2");
+google.load("gdata", "2.x", {packages: ["calendar"]}); // Load the Google jsapi
+</script>
+
+<link type="text/css" href="jquery-ui/css/custom-theme/jquery-ui-1.8.14.custom.css" rel="stylesheet" />
+<link type="text/css" href="wotd.css" rel="stylesheet" />
+<link type="text/css" href="opacity-itnewb.css" rel="stylesheet" />
+<script type="text/javascript" src="jquery-ui/js/jquery-ui-1.8.14.custom.min.js"></script>
+<script type="text/javascript" src="date-js/date-en-US.js"></script>
+<!-- Included css and js }}} -->
+<!-- jQuery textFill {{{ -->
+<script>
+$.fn.textfill = function(options) {
+    var defaults = {
+        minFontPixels: 16,
+        maxFontPixels: 144,
+        fontIncrement: 8,
+        innerTag: 'span'
+    };
+    var Opts = jQuery.extend(defaults, options);
+    return this.each(function() {
+        var fontSize = Opts.minFontPixels;
+        var ourText = $(Opts.innerTag + ':visible:first', this);
+        var maxHeight = $(this).height();
+        var maxWidth = $(this).width();
+        var textHeight;
+        var textWidth;
+        do {
+            ourText.css('font-size', fontSize);
+            textHeight = ourText.height();
+            textWidth = ourText.width();
+            fontSize = fontSize + Opts.fontIncrement;
+        } while ((textHeight < maxHeight) && (textWidth < maxWidth) && (fontSize <= Opts.maxFontPixels));
+    });
+};
+</script>
+<!-- jQuery textFill }}} -->
+<!-- Main JavaScript {{{ -->
+<script>
+
+var wotdPanels = [];
+var wotdCurrentPanel = 0;
+var dwellTime = 2200;
+var fadeTime = 500;
+var timer;
+var feedUrl = "https://www.google.com/calendar/feeds/u6g675oejpdha4pncv50rmi8tc%40group.calendar.google.com/public/basic";
+var feedUrltotd  = "https://www.google.com/calendar/feeds/te8k0626iqt47ah82242on0mk0%40group.calendar.google.com/public/basic";
+var runState = "running";
+
+var maxResults = 3652; // 10 years worth of results, counting leap years
+var previousCount = 4;
+var __LOADED_postLoadInit = 0;
+
+function switchFade() {
+    wotdCurrentPanel++;
+    $('div.display').fadeOut(fadeTime,function(){
+        if(wotdCurrentPanel >= wotdPanels.length) {
+            wotdCurrentPanel = 0;
+            clearTimeout(timer);
+            _run();
+        } else {
+            showPanel();
+        }
+    });
+}
+
+function showPanel() {
+    $('div.display').replaceWith(wotdPanels[wotdCurrentPanel]);
+    $('.textfill').textfill({ innerTag: 'span', maxFontPixels: 288, });
+    timer = setTimeout(switchFade,dwellTime); 
+}
+
+function makePanels(entries) {
+    var eventTitle = entries[0].getTitle().getText();
+    var panels = [];
+    panels.push('<div class="display"><div class="textfill" id="subject"><span>' + entries[0].getTitle().getText() + '</span></div><div id="footer">Word of the Day</div></div>');
+
+    var pastWords = [];
+    for (var i = 1; i <= previousCount; i++) {
+        pastWords.push(entries[i].getTitle().getText() + '<br/>');
+    }
+    panels.push('<div class="display"><div class="textfill"><div id="subject"><span>' + pastWords.join('') + '</span></div></div><div id="footer">Previous Words of the Day</div></div>');
+    return(panels);
+}
+
+function postLoadInit () {
+    if (__LOADED_postLoadInit != 0) {
+        return true;
+    }
+    __LOADED_postLoadInit = 1;
+
+    // Instantiate Options Dialog
+    $('#dialog-form').dialog({
+        autoOpen: false,
+        title: 'Announcement Options',
+        modal: true,
+        minWidth: 1024,
+        minHeight: 400,
+        buttons: {
+            "Ok": function() { 
+                $(this).dialog("close"); 
+                feedUrl = $( '#aro-form-textarea-source' ).val();
+                dwellTime = $( '#aro-form-textbox-dwell').val() * 1000;
+                fadeTime = $( '#aro-form-textbox-fade').val() * 1000;
+                previousCount = $('#aro-form-textbox-pastwords').val;
+                clearTimeout(timer);
+                timer = setTimeout(switchFade,dwellTime); 
+            }, 
+            "Cancel": function() { 
+                $(this).dialog("close"); 
+            } 
+        },
+    }).removeClass('hidden'); // It starts off hidden so that you can't see it during the chains of callbacks, so show it.
+    $('#btn-config').click(function() { $('#dialog-form').dialog('open'); return false; });
+    $('#btn-calendar').click(function() { window.open('https://www.google.com/calendar/embed?src=u6g675oejpdha4pncv50rmi8tc%40group.calendar.google.com&ctz=America/Chicago', "googCal")});
+
+    // Populate form elements with current js variable values
+    $('#aro-form-textbox-dwell').val(dwellTime / 1000);
+    $('#aro-form-textbox-fade').val(fadeTime / 1000);
+    $('#aro-form-textarea-source').val(feedUrl);
+    $('#aro-form-textbox-pastwords' ).val(previousCount);
+
+    $( "#aro-form-slider-dwell" ).slider({
+        range: "max",
+        min: .5,
+        max: 600,
+        step: .5,
+        value: dwellTime / 1000,
+        slide: function( event, ui ) {
+            $( "#aro-form-textbox-dwell" ).val( ui.value );
+        }
+    });
+
+    $( "#aro-form-slider-fade" ).slider({
+        range: "max",
+        min: .5,
+        max: 5,
+        step: .1,
+        value: fadeTime / 1000,
+        slide: function( event, ui ) {
+            $( "#aro-form-textbox-fade" ).val( ui.value );
+        }
+    });
+
+    $( "#aro-form-slider-pastwords" ).slider({
+        range: "max",
+        min: 1,
+        max: 33,
+        value: previousCount,
+        slide: function( event, ui ) {
+            $( "#aro-form-textbox-pastwords" ).val( ui.value );
+        }
+    });
+
+}
+
+function callback (result) {
+    $(function() {
+        // Set today's date for the calendar icon
+        var Today = Date.today().toString('dd');
+         $('#today').replaceWith('<span id="today">' + Today + '</span>');
+
+        // Get entries and make panels
+        var entries = result.feed.getEntries();
+        wotdPanels = makePanels(entries);
+
+        // Get things going with the roller
+        postLoadInit();
+        showPanel(); // Get started with first panel
+    });
+};
+    
+// Error handler to be invoked when getEventsFeed() produces an error
+var handleError = function (error) {
+    $('div.display').replaceWith('<pre>' + error + '</pre>');
+};
+
+function _run() {
+    var calendarService = new google.gdata.calendar.CalendarService('LiquidChicken-wotdDisplayer-1.0');
+    var query = new google.gdata.calendar.CalendarEventQuery(feedUrl);
+    query.setOrderBy('starttime');
+    query.setSortOrder('descending');
+    var maxDate = new google.gdata.DateTime(Date.today());
+    query.setMaximumStartTime(maxDate);
+    query.setMaxResults(maxResults); // Keep us out of trouble
+    calendarService.getEventsFeed(query, callback, handleError);
+}
+
+google.setOnLoadCallback(_run);
+
+</script>
+<!-- Main JavaScript }}} -->
+</head>
+<!-- HTML: Body {{{1 -->
+<body>
+<div id="container">
+    <div id="buttonbar">
+        <div class="fadeAble" id="btn-config"><img id="img-config" src="images/Gear-UI-48.png" width="48" height="48"></div>
+
+        <div class="fadeAble" id="btn-calendar">
+            <img id="img-calendar" src="images/_blank-Calendar-UI-48.png" width="48" height="48">
+            <div id="date-text"><span id="today"></span></div>
+        </div>
+    </div>
+    <div class="display">
+        <div class="textfill" id="subject"><span></span></div>
+        <div id="footer"/>
+    </div>
+</div>
+
+<div class="hidden" id="dialog-form" title="Announcement Options">
+    <form id="aro-form">
+    <fieldset>
+        <div class="form-element">
+            <label for="aro-form-textbox-dwell" class="ui-corner-all">Dwell Time</label>
+            <div id="form-dwell" class="form-element-box ui-corner-all">
+                <input type="text" size="5" id="aro-form-textbox-dwell" class="ui-widget-content ui-corner-all">&nbsp;s
+                <div id="aro-form-slider-dwell" class="slider"></div>
+            </div>
+        </div>
+
+        <div class="form-element">
+            <label for="aro-form-textbox-fade" class="ui-corner-all">Fade Time</label>
+            <div id="form-fade" class="form-element-box ui-corner-all">
+                <input type="text" size="5" id="aro-form-textbox-fade" class="ui-widget-content ui-corner-all">&nbsp;s
+                <div id="aro-form-slider-fade" class="slider"></div>
+            </div>
+        </div>
+
+        <div class="form-element">
+            <label for="aro-form-textbox-pastwords" class="ui-corner-all">Past Words</label>
+             <div id="form-pastwords" class="form-element-box ui-corner-all">
+                <input type="text" size="3" id="aro-form-textbox-pastwords" class="ui-widget-content ui-corner-all">
+                <div id="aro-form-slider-pastwords" class="slider"></div>
+            </div>
+        </div>
+
+        <div class="form-element">
+            <label for="aro-form-textarea-source" class="ui-corner-all">Word Source</label>
+            <div id="form-source" class="form-element-box ui-corner-all">
+                <textarea id="aro-form-textarea-source" class="ui-widget-content ui-corner-all"></textarea>
+            </div>
+        </div>
+	</fieldset>
+    </form>
+</div>
+
+</body>
+<!-- HTML: Body }}} -->
+</html>

@@ -1,0 +1,53 @@
+/* Page defaults and basic positioning {{{ */
+html, body  {
+    height:         100%;
+    width:          100%;
+    font-family:    "Trebuchet MS",sans-serif;
+    background-color: #000000;
+    color: #bbbbbd;
+    text-align:center;
+    overflow: hidden;
+    } 
+
+#container  { position:relative; min-height: 100%; }
+.textfill   { position:fixed; top: 0px; bottom: 200px; left: 0%; right: 0%; }
+#footer     { position:fixed; bottom: 10px; left: 15%; right: 15%; font-size:36px; }
+img         { margin: 2px 2px; } /* what is this for? }}}*/
+
+/* Font sizes for panels {{{ */
+.hugeItem   { font-size:230px; }
+.largeItem  { font-size:168px; }
+.mediumItem { font-size:96px; } 
+.smallItem  { font-size:36px; }
+.tinyItem   { font-size:18px; } /* }}} */
+
+/* Form and Button Bar */
+.hidden     { visibility:hidden; }
+fieldset    { border:0px solid white; margin-top:22px;}
+#buttonbar { z-index:2; position:absolute; float:right; bottom: 20px; right:1%; }
+/* Calendar button {{{ */
+#btn-calendar { position: relative; width:100%; }
+#date-text {
+    font-family: "Arial",sans-serif;
+    font-size:20px;
+    position: absolute;
+    top: 20px;
+    left: 0px;
+    width: 100%;
+    padding: 0px 0px 0px 0px;
+    } /* }}} */
+
+    
+
+/* Form styling */
+/* #aro-form { border:1px solid white;} */
+.form-element {margin-bottom:48px;}
+label   {float:left; margin-left:24px; margin-top:-12px; border:1px solid gray; padding: 2px 8px; background-image:url(jquery-ui/css/custom-theme/images/ui-bg_flat_0_000000_40x100.png);}
+.slider {margin:0px 15px 15px 24px;}
+#form-dwell { border:1px dotted gray; }
+#form-fade { border:1px dotted gray; }
+#form-pastwords { border:1px dotted gray; }
+#form-source { border:1px dotted gray; }
+.ui-widget-content textarea {border:none; height:40px; width:900; max-height:40px; max-width:900;}
+
+
