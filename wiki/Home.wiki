@@ -7,7 +7,7 @@ The LiquidChicken Word of the Day Roller polls a Google calendar for current and
   * Update calendar icon with today's date
   * Add "make link" button that displays a save-able URL
   * Options dialog layout improvement
-  * Add word dialog
+  * Add word/calendar dialog
 
 == BlueSkyFeatures ==
   * multiple sources/panel types
