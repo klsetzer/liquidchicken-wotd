@@ -94,7 +94,7 @@ $.fn.textfill = function(options) {
 
 var wotdPanels = [];
 var wotdCurrentPanel = 0;
-var dwellTime = 1222;
+var dwellTime = 22200;
 var fadeTime = 500;
 var timer;
 var feedUrl = "https://www.google.com/calendar/feeds/u6g675oejpdha4pncv50rmi8tc%40group.calendar.google.com/public/basic";
@@ -148,12 +148,17 @@ function postLoadInit () {
         autoOpen: false,
         title: 'Announcement Options',
         modal: true,
+        minWidth: 1024,
+        minHeight: 400,
         buttons: {
             "Ok": function() { 
                 $(this).dialog("close"); 
-                feedUrl = $( '#aro-form-input-source' ).val();
-                dwellTime = $( '#aro-form-input-dwell').val() * 1000;
-                fadeTime = $( '#aro-form-input-fade').val() * 1000;
+                feedUrl = $( '#aro-form-textarea-source' ).val();
+                dwellTime = $( '#aro-form-textbox-dwell').val() * 1000;
+                fadeTime = $( '#aro-form-textbox-fade').val() * 1000;
+                previousCount = $('#aro-form-textbox-pastwords').val;
+                clearTimeout(timer);
+                timer = setTimeout(switchFade,dwellTime); 
             }, 
             "Cancel": function() { 
                 $(this).dialog("close"); 
@@ -162,21 +167,34 @@ function postLoadInit () {
     }).removeClass('hidden'); // It starts off hidden so that you can't see it during the chains of callbacks, so show it.
     $('#btn-config').click(function() { $('#dialog-form').dialog('open'); return false; });
     $('#btn-calendar').click(function() { window.open('https://www.google.com/calendar/embed?src=u6g675oejpdha4pncv50rmi8tc%40group.calendar.google.com&ctz=America/Chicago', "googCal")});
-    $('#btn-startstop').click(function() {
-        if (runState == "running") {
-            runState = "stopped";
-            $('#img-startstop').replaceWith('<img id="img-startstop" src="images/Video-Play-UI-48.png" width="48" height="48" />');
-            clearTimeout(timer);
-        } else {
-            runState = "running";
-            $('#img-startstop').replaceWith('<img id="img-startstop" src="images/Stop-UI-48.png" width="48" height="48" />');
-            timer = setTimeout(switchFade,dwellTime); 
-        }
 
+    // Populate form elements with current js variable values
+    $('#aro-form-textbox-dwell').val(dwellTime / 1000);
+    $('#aro-form-textbox-fade').val(fadeTime / 1000);
+    $('#aro-form-textarea-source').val(feedUrl);
+    $('#aro-form-textbox-pastwords' ).val(previousCount);
+
+    $( "#aro-form-slider-dwell" ).slider({
+        range: "max",
+        min: .5,
+        max: 600,
+        step: .5,
+        value: dwellTime / 1000,
+        slide: function( event, ui ) {
+            $( "#aro-form-textbox-dwell" ).val( ui.value );
+        }
     });
-    document.getElementById("aro-form-input-dwell").value = dwellTime / 1000;
-    document.getElementById("aro-form-input-fade").value = fadeTime / 1000;
-    document.getElementById("aro-form-input-source").value = feedUrl;
+
+    $( "#aro-form-slider-fade" ).slider({
+        range: "max",
+        min: .5,
+        max: 5,
+        step: .1,
+        value: fadeTime / 1000,
+        slide: function( event, ui ) {
+            $( "#aro-form-textbox-fade" ).val( ui.value );
+        }
+    });
 
     $( "#aro-form-slider-pastwords" ).slider({
         range: "max",
@@ -185,11 +203,9 @@ function postLoadInit () {
         value: previousCount,
         slide: function( event, ui ) {
             $( "#aro-form-textbox-pastwords" ).val( ui.value );
-            previousCount = ui.value;
         }
     });
 
-    $( "#aro-form-textbox-pastwords" ).val( $( "#aro-form-slider-pastwords" ).slider( "value" ) );
 }
 
 function callback (result) {
@@ -239,8 +255,6 @@ google.setOnLoadCallback(_run);
             <img id="img-calendar" src="images/_blank-Calendar-UI-48.png" width="48" height="48">
             <div id="date-text"><span id="today" /></div>
         </div>
-
-        <div class="fadeAble" id="btn-startstop"><img id="img-startstop" src="images/Stop-UI-48.png" width="48" height="48"></div> 
     </div>
     <div class="display">
         <div class="textfill" id="subject"><span></span></div>
@@ -250,22 +264,27 @@ google.setOnLoadCallback(_run);
 
 <div class="hidden" id="dialog-form" title="Announcement Options">
     <form id="aro-form">
+    <br />
     <fieldset>
-		<label for="aro-form-input-source">Word Source</label>
-		<input type="text" size="10" name="wordSource" id="aro-form-input-source" class="text ui-widget-content ui-corner-all"/>
-        <br/>
-		<label for="aro-form-input-dwell">Dwell Time</label>
-		<input type="text" size="5" id="aro-form-input-dwell" class="text ui-widget-content ui-corner-all" />&nbsp;s
-        <br/>
+        <div class="form-labels">
+            <label for="aro-form-textbox-dwell">Dwell Time</label> <br />
+            <label for="aro-form-textbox-fade">Fade Time</label> <br />
+            <label for="aro-form-textbox-pastwords">Past Words</label> <br />
+        </div>
+        <div class="form-indicators">
+            <input type="text" size="5" id="aro-form-textbox-dwell" class="form-indicators text ui-widget-content ui-corner-all" />&nbsp;s <br />
+            <input type="text" size="5" id="aro-form-textbox-fade" class="form-indicators text ui-widget-content ui-corner-all" />&nbsp;s <br />
+            <input type="text" size="3" id="aro-form-textbox-pastwords" class="form-indicators text ui-widget-content ui-corner-all"/> <br />
+        </div>
+        <div class="form-xcontrols">
+            <div id="aro-form-slider-dwell" /> <br />
+            <div id="aro-form-slider-fade" /> <br />
+            <div id="aro-form-slider-pastwords" /> <br />
+        </div>
+        <br />
 
-		<label for="aro-form-input-fade">Fade Time</label>
-		<input type="text" size="5" name="fadeTime" id="aro-form-input-fade" class="text ui-widget-content ui-corner-all" />&nbsp;s
-        <br/>
-            <div id="aro-form-part-past">
-                <label for="aro-form-textbox-pastwords">Past Words:</label>
-                <input type="text" size="3" id="aro-form-textbox-pastwords" class="text ui-widget-content ui-corner-all"/>
-            </div>
-            <div id="aro-form-slider-pastwords">
+		<label for="aro-form-textarea-source">Word Source</label>
+		<textarea rows="2" cols="80" name="wordSource" id="aro-form-textarea-source" class="text ui-widget-content ui-corner-all"/>
 	</fieldset>
     </form>
 </div>
