@@ -148,6 +148,8 @@ function postLoadInit () {
         autoOpen: false,
         title: 'Announcement Options',
         modal: true,
+        minWidth: 1440,
+        minHeight: 480,
         buttons: {
             "Ok": function() { 
                 $(this).dialog("close"); 
@@ -174,9 +176,33 @@ function postLoadInit () {
         }
 
     });
-    document.getElementById("aro-form-input-dwell").value = dwellTime / 1000;
-    document.getElementById("aro-form-input-fade").value = fadeTime / 1000;
+    document.getElementById("aro-form-slider-dwell").value = dwellTime / 1000;
+    document.getElementById("aro-form-slider-fade").value = fadeTime / 1000;
     document.getElementById("aro-form-input-source").value = feedUrl;
+
+    $( "#aro-form-slider-dwell" ).slider({
+        range: "max",
+        min: .5,
+        max: 600,
+        step: .5,
+        value: dwellTime / 1000,
+        slide: function( event, ui ) {
+            $( "#aro-form-textbox-dwell" ).val( ui.value );
+            dwellTime = ui.value * 1000;
+        }
+    });
+
+    $( "#aro-form-slider-fade" ).slider({
+        range: "max",
+        min: .5,
+        max: 5,
+        step: .2,
+        value: fadeTime / 1000,
+        slide: function( event, ui ) {
+            $( "#aro-form-textbox-fade" ).val( ui.value );
+            fadeTime = ui.value * 1000;
+        }
+    });
 
     $( "#aro-form-slider-pastwords" ).slider({
         range: "max",
@@ -239,8 +265,6 @@ google.setOnLoadCallback(_run);
             <img id="img-calendar" src="images/_blank-Calendar-UI-48.png" width="48" height="48">
             <div id="date-text"><span id="today" /></div>
         </div>
-
-        <div class="fadeAble" id="btn-startstop"><img id="img-startstop" src="images/Stop-UI-48.png" width="48" height="48"></div> 
     </div>
     <div class="display">
         <div class="textfill" id="subject"><span></span></div>
@@ -251,21 +275,23 @@ google.setOnLoadCallback(_run);
 <div class="hidden" id="dialog-form" title="Announcement Options">
     <form id="aro-form">
     <fieldset>
-		<label for="aro-form-input-source">Word Source</label>
-		<input type="text" size="10" name="wordSource" id="aro-form-input-source" class="text ui-widget-content ui-corner-all"/>
-        <br/>
-		<label for="aro-form-input-dwell">Dwell Time</label>
-		<input type="text" size="5" id="aro-form-input-dwell" class="text ui-widget-content ui-corner-all" />&nbsp;s
-        <br/>
+		<label for="aro-form-textbox-dwell">Dwell Time</label>
+		<input type="text" size="5" id="aro-form-textbox-dwell" class="text ui-widget-content ui-corner-all" />&nbsp;s
+        <div id="aro-form-slider-dwell" />
+        <br />
 
-		<label for="aro-form-input-fade">Fade Time</label>
-		<input type="text" size="5" name="fadeTime" id="aro-form-input-fade" class="text ui-widget-content ui-corner-all" />&nbsp;s
-        <br/>
-            <div id="aro-form-part-past">
-                <label for="aro-form-textbox-pastwords">Past Words:</label>
-                <input type="text" size="3" id="aro-form-textbox-pastwords" class="text ui-widget-content ui-corner-all"/>
-            </div>
-            <div id="aro-form-slider-pastwords">
+		<label for="aro-form-textbox-fade">Fade Time</label>
+		<input type="text" size="5" id="aro-form-textbox-fade" class="text ui-widget-content ui-corner-all" />&nbsp;s
+        <div id="aro-form-slider-fade" />
+        <br />
+
+        <label for="aro-form-textbox-pastwords">Past Words</label>
+        <input type="text" size="3" id="aro-form-textbox-pastwords" class="text ui-widget-content ui-corner-all"/>
+        <div id="aro-form-slider-pastwords" />
+        <br />
+
+		<label for="aro-form-input-source">Word Source</label>
+		<textarea rows="3" cols="150" name="wordSource" id="aro-form-input-source" class="text ui-widget-content ui-corner-all"/>
 	</fieldset>
     </form>
 </div>
