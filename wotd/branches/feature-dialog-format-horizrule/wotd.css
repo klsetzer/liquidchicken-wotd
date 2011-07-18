@@ -23,7 +23,7 @@ img         { margin: 2px 2px; } /* what is this for? }}}*/
 
 /* Form and Button Bar */
 .hidden     { visibility:hidden; }
-fieldset    { border:0px solid white; margin-top:22px;}
+fieldset    { border:none; margin-top:22px;}
 #buttonbar { z-index:2; position:absolute; float:right; bottom: 20px; right:1%; }
 /* Calendar button {{{ */
 #btn-calendar { position: relative; width:100%; }
@@ -37,10 +37,7 @@ fieldset    { border:0px solid white; margin-top:22px;}
     padding: 0px 0px 0px 0px;
     } /* }}} */
 
-    
-
 /* Form styling */
-/* #aro-form { border:1px solid white;} */
 .form-element {margin-bottom:48px; border-top:1px dotted gray;}
 label   {float:left; margin-left:15px; margin-top:-15px; padding: 2px 6px 3px; background-image:url(jquery-ui/css/custom-theme/images/ui-bg_flat_0_000000_40x100.png);}
 .slider {margin:0px 15px 15px 24px;}
@@ -48,6 +45,8 @@ label   {float:left; margin-left:15px; margin-top:-15px; padding: 2px 6px 3px; b
 #form-fade label{ border:1px solid #005500; }
 #form-pastwords label{ border:1px solid #000099; }
 #form-source label{ border:1px solid #880088; }
-.ui-widget-content textarea {border:none; height:40px; width:900; max-height:40px; max-width:900;}
-
+.form-element {clear:both;}
+textarea {border:none; height:40px; width:1900; max-height:40px; max-width:1900;}
+/* .stealthy-textbox {float:left; border:none;} */
+/* .form-control {float:right}; */
 
