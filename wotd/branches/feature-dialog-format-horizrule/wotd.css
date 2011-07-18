@@ -38,17 +38,17 @@ fieldset    { border:none; margin-top:22px;}
     } /* }}} */
 
 /* Form styling */
-.form-element {margin-bottom:48px; border-top:1px dotted gray;}
-label   {float:left; margin-left:15px; margin-top:-15px; padding: 2px 6px 3px; background-image:url(jquery-ui/css/custom-theme/images/ui-bg_flat_0_000000_40x100.png);}
+label   {float:left; margin-left:10px; margin-top:-15px; padding: 2px 6px 3px; background-image:url(jquery-ui/css/custom-theme/images/ui-bg_flat_0_000000_40x100.png);}
 .slider {margin:0px 15px 15px 24px;}
 #form-dwell label{ border:1px solid #880000; }
 #form-fade label{ border:1px solid #005500; }
 #form-pastwords label{ border:1px solid #000099; }
 #form-source label{ border:1px solid #880088; }
-.form-element {clear:both;}
-textarea {border:none; height:40px; width:1000; max-height:40px; max-width:1000;}
+textarea {border:none; height:90px; width:950px; max-height:90px; max-width:950px;}
 .stealthy-textbox {float:left; border:none; width:90px; }
-.form-control {float:right; width:900px;}
 
-/* .stealthy-textbox {border:none;} */
-
+.form-element {margin-bottom:48px; border-top:1px solid gray; }
+/* .form-element-label { clear:both; } */
+.fec-indicator {float:left;}
+.fec-slider {clear:left;}
+.form-element-control {margin-top:22px; margin-left:20px;}
