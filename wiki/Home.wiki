@@ -9,6 +9,7 @@ The LiquidChicken Word of the Day Roller polls a Google calendar for current and
   * Add word/calendar dialog
 
 == BlueSkyFeatures ==
+  * Previous words of the day are random?
   * multiple sources/panel types
     * Panel Types: wotd, previous, qotd, announcement
   * handle multiple events per day
