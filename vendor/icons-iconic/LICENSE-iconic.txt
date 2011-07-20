@@ -1,0 +1,12 @@
+Description: Iconic is a minimal set of icons consisting of 136 marks in
+raster, vector and font formats — free for public use.
+
+URL: http://somerandomdude.com/projects/iconic/
+
+License: Licensed as CC Attribution-Share Alike 3.0 & OFL
+
+License URLs:
+    http://creativecommons.org/licenses/by-sa/3.0/us/
+    http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL
+
+
