@@ -4,9 +4,7 @@
 The LiquidChicken Word of the Day Roller polls a Google calendar for current and past words and displays them in a billboard fashion.
 
 == ToDoList ==
-  * Add "make link" button that displays a save-able URL
-  * Options dialog layout improvement
-  * Add word/calendar dialog
+ Upcoming features and fixes
 
 == BlueSkyFeatures ==
   * Previous words of the day are random?
