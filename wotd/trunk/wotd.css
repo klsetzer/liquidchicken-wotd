@@ -1,3 +1,4 @@
+/* Page defaults and basic positioning {{{ */
 html, body  {
     height:         100%;
     width:          100%;
@@ -6,48 +7,25 @@ html, body  {
     color: #bbbbbd;
     text-align:center;
     overflow: hidden;
-    }
-.hugeItem   { font-size:230px; }
-.largeItem  { font-size:168px; }
-.mediumItem { font-size:96px; } 
-.smallItem  { font-size:36px; }
-.tinyItem   { font-size:18px; }
-.hidden     { visibility:hidden; }
-
+    } 
 
 #container  { position:relative; min-height: 100%; }
 .textfill   { position:fixed; top: 0px; bottom: 200px; left: 0%; right: 0%; }
 #footer     { position:fixed; bottom: 10px; left: 15%; right: 15%; font-size:36px; }
+img         { margin: 2px 2px; } /* what is this for? }}}*/
 
-.wotd-history-table { position:fixed; top:22%; left:0px; right:0px; color:red; border:2px solid blue;}
+/* Font sizes for panels {{{ */
+.hugeItem   { font-size:230px; }
+.largeItem  { font-size:168px; }
+.mediumItem { font-size:96px; } 
+.smallItem  { font-size:36px; }
+.tinyItem   { font-size:18px; } /* }}} */
 
-#buttonbar-bottom {
-    z-index:2;
-    position:absolute;
-    float:right;
-    bottom: 20px;
-    right:1%;
-    }
-    
-#buttonbar-topright {
-    width: 72px;
-    z-index: 2;
-    position: absolute;
-    bottom: 1%;
-    top: 1%;
-    right: 10px; }
-    
-img         { margin: 2px 2px; }
-fieldset    { border:none; }
-
-/* Form styling */
-#aro-form { width:100%; }
-.form-labels { float:left; }
-.form-indicators {margin-left:100px; }
-.form-controls { float:right; }
-
-
-/* date button stuff */
+/* Form and Button Bar */
+.hidden     { visibility:hidden; }
+fieldset    { border:none; margin-top:22px;}
+#buttonbar { z-index:2; position:absolute; float:right; bottom: 20px; right:1%; }
+/* Calendar button {{{ */
 #btn-calendar { position: relative; width:100%; }
 #date-text {
     font-family: "Arial",sans-serif;
@@ -57,5 +35,21 @@ fieldset    { border:none; }
     left: 0px;
     width: 100%;
     padding: 0px 0px 0px 0px;
-    }
+    } /* }}} */
 
+/* Form styling */
+.muted  {color:#555555; font-style:italic; font-weight:normal; font-size:14px;}
+label   {float:left; margin-left:10px; margin-top:-15px; padding: 2px 6px 3px; background-image:url(jquery-ui/css/custom-theme/images/ui-bg_flat_0_000000_40x100.png);}
+.slider {margin:0px 15px 15px 24px;}
+#form-dwell label{ border:1px solid #880000; }
+#form-fade label{ border:1px solid #005500; }
+#form-pastwords label{ border:1px solid #000099; }
+#form-source label{ border:1px solid #880088; }
+textarea {border:none; height:90px; width:950px; max-height:90px; max-width:950px;}
+.stealthy-textbox {float:left; border:none; width:90px; }
+
+.form-element {margin-bottom:48px; border-top:1px solid gray; }
+.form-element-label { clear:both; }
+.fec-indicator { text-align:right; width:40px; vertical-align:text-top;}
+.fec-slider {width:880px; margin-left:60px; }
+.form-element-control {margin-top:22px; margin-left:20px; }

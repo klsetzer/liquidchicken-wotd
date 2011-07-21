@@ -66,7 +66,7 @@ google.load("gdata", "2.x", {packages: ["calendar"]}); // Load the Google jsapi
 <script>
 $.fn.textfill = function(options) {
     var defaults = {
-        minFontPixels: 16,
+        minFontPixels: 10,
         maxFontPixels: 144,
         fontIncrement: 8,
         innerTag: 'span'
@@ -89,20 +89,37 @@ $.fn.textfill = function(options) {
 };
 </script>
 <!-- jQuery textFill }}} -->
+<!-- QueryString getter {{{ -->
+<script>
+//http://stackoverflow.com/questions/901115/get-query-string-values-in-javascript
+var urlParams = {};
+(function () {
+    var e,
+        a = /\+/g,  // Regex for replacing addition symbol with a space
+        r = /([^&=]+)=?([^&]*)/g,
+        d = function (s) { return decodeURIComponent(s.replace(a, " ")); },
+        q = window.location.search.substring(1);
+
+    while (e = r.exec(q))
+       urlParams[d(e[1])] = d(e[2]);
+})();
+</script>
+<!-- QueryString getter }}} -->
 <!-- Main JavaScript {{{ -->
 <script>
 
-var wotdPanels = [];
-var wotdCurrentPanel = 0;
-var dwellTime = 22200;
+var dwellTime = 3500;
 var fadeTime = 500;
-var timer;
+var previousCount = 3;
 var feedUrl = "https://www.google.com/calendar/feeds/u6g675oejpdha4pncv50rmi8tc%40group.calendar.google.com/public/basic";
 var feedUrltotd  = "https://www.google.com/calendar/feeds/te8k0626iqt47ah82242on0mk0%40group.calendar.google.com/public/basic";
-var runState = "running";
 
+var wotdPanels = [];
+var wotdCurrentPanel = 0;
+var timer;
+var runState = "running";
 var maxResults = 3652; // 10 years worth of results, counting leap years
-var previousCount = 4;
+
 var __LOADED_postLoadInit = 0;
 
 function switchFade() {
@@ -146,7 +163,7 @@ function postLoadInit () {
     // Instantiate Options Dialog
     $('#dialog-form').dialog({
         autoOpen: false,
-        title: 'Announcement Options',
+        title: 'Options',
         modal: true,
         minWidth: 1024,
         minHeight: 400,
@@ -156,7 +173,7 @@ function postLoadInit () {
                 feedUrl = $( '#aro-form-textarea-source' ).val();
                 dwellTime = $( '#aro-form-textbox-dwell').val() * 1000;
                 fadeTime = $( '#aro-form-textbox-fade').val() * 1000;
-                previousCount = $('#aro-form-textbox-pastwords').val;
+                previousCount = $('#aro-form-textbox-pastwords').val();
                 clearTimeout(timer);
                 timer = setTimeout(switchFade,dwellTime); 
             }, 
@@ -174,10 +191,16 @@ function postLoadInit () {
     $('#aro-form-textarea-source').val(feedUrl);
     $('#aro-form-textbox-pastwords' ).val(previousCount);
 
+    // DWELL TIME
+    // == textbox updates slider
+    $('#aro-form-textbox-dwell').keyup(function () {
+        $('#aro-form-slider-dwell').slider("value", $("#aro-form-textbox-dwell").val());
+    });
+    // == slider updates textbox
     $( "#aro-form-slider-dwell" ).slider({
         range: "max",
-        min: .5,
-        max: 600,
+        min: 2,
+        max: 180,
         step: .5,
         value: dwellTime / 1000,
         slide: function( event, ui ) {
@@ -185,17 +208,29 @@ function postLoadInit () {
         }
     });
 
+    // FADE TIME
+    // == textbox updates slider
+    $('#aro-form-textbox-fade').keyup(function () {
+        $('#aro-form-slider-fade').slider("value", $("#aro-form-textbox-fade").val());
+    });
+    // == slider updates textbox
     $( "#aro-form-slider-fade" ).slider({
         range: "max",
         min: .5,
         max: 5,
-        step: .1,
+        step: .05,
         value: fadeTime / 1000,
         slide: function( event, ui ) {
             $( "#aro-form-textbox-fade" ).val( ui.value );
         }
     });
 
+    // PAST WORDS
+    // == textbox updates slider
+    $('#aro-form-textbox-pastwords').keyup(function () {
+        $('#aro-form-slider-pastwords').slider("value", $("#aro-form-textbox-pastwords").val());
+    });
+    // == slider updates textbox
     $( "#aro-form-slider-pastwords" ).slider({
         range: "max",
         min: 1,
@@ -248,12 +283,12 @@ google.setOnLoadCallback(_run);
 <!-- HTML: Body {{{1 -->
 <body>
 <div id="container">
-    <div id="buttonbar-bottom">
+    <div id="buttonbar">
         <div class="fadeAble" id="btn-config"><img id="img-config" src="images/Gear-UI-48.png" width="48" height="48"></div>
 
         <div class="fadeAble" id="btn-calendar">
             <img id="img-calendar" src="images/_blank-Calendar-UI-48.png" width="48" height="48">
-            <div id="date-text"><span id="today" /></div>
+            <div id="date-text"><span id="today"></span></div>
         </div>
     </div>
     <div class="display">
@@ -264,27 +299,37 @@ google.setOnLoadCallback(_run);
 
 <div class="hidden" id="dialog-form" title="Announcement Options">
     <form id="aro-form">
-    <br />
     <fieldset>
-        <div class="form-labels">
-            <label for="aro-form-textbox-dwell">Dwell Time</label> <br />
-            <label for="aro-form-textbox-fade">Fade Time</label> <br />
-            <label for="aro-form-textbox-pastwords">Past Words</label> <br />
+        <div id="form-dwell" class="form-element">
+            <label for="aro-form-textbox-dwell" class="form-element-label ui-corner-all">Dwell Time <span class="muted">(s)</span></label>
+            <div class="form-element-control">
+                <input type="text" size="3" id="aro-form-textbox-dwell" class="fec-indicator ui-widget-content stealthy-textbox">
+                <div id="aro-form-slider-dwell" class="fec-slider slider"></div>
+            </div>
         </div>
-        <div class="form-indicators">
-            <input type="text" size="5" id="aro-form-textbox-dwell" class="form-indicators text ui-widget-content ui-corner-all" />&nbsp;s <br />
-            <input type="text" size="5" id="aro-form-textbox-fade" class="form-indicators text ui-widget-content ui-corner-all" />&nbsp;s <br />
-            <input type="text" size="3" id="aro-form-textbox-pastwords" class="form-indicators text ui-widget-content ui-corner-all"/> <br />
-        </div>
-        <div class="form-xcontrols">
-            <div id="aro-form-slider-dwell" /> <br />
-            <div id="aro-form-slider-fade" /> <br />
-            <div id="aro-form-slider-pastwords" /> <br />
-        </div>
-        <br />
 
-		<label for="aro-form-textarea-source">Word Source</label>
-		<textarea rows="2" cols="80" name="wordSource" id="aro-form-textarea-source" class="text ui-widget-content ui-corner-all"/>
+        <div id="form-fade" class="form-element">
+            <label for="aro-form-textbox-fade" class="form-element-label ui-corner-all">Fade Time <span class="muted">(s)</span></label>
+            <div class="form-element-control">
+                <input type="text" size="3" id="aro-form-textbox-fade" class="fec-indicator ui-widget-content stealthy-textbox">
+                <div id="aro-form-slider-fade" class="fec-slider slider"></div>
+            </div>
+        </div>
+
+        <div id="form-pastwords" class="form-element">
+            <label for="aro-form-textbox-pastwords" class="form-element-label ui-corner-all">Past Words</label>
+             <div class="form-element-control">
+                <input type="text" size="3" id="aro-form-textbox-pastwords" class="fec-indicator ui-widget-content stealthy-textbox">
+                <div id="aro-form-slider-pastwords" class="fec-slider slider"></div>
+            </div>
+        </div>
+
+        <div id="form-source" class="form-element">
+            <label for="aro-form-textarea-source" class="form-element-label ui-corner-all">Word Source</label>
+            <div class="form-element-control">
+                <textarea id="aro-form-textarea-source" class="ui-widget-content ui-corner-all"></textarea>
+            </div>
+        </div>
 	</fieldset>
     </form>
 </div>
