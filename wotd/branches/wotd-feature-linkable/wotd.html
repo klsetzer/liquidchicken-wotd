@@ -160,6 +160,12 @@ function postLoadInit () {
     }
     __LOADED_postLoadInit = 1;
 
+    // See if Query String has options Set
+    if ("dwellTime" in urlParams) {
+        dwellTime = urlParams["dwellTime"];
+    }
+
+
     // Instantiate Options Dialog
     $('#dialog-form').dialog({
         autoOpen: false,
