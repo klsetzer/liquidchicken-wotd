@@ -135,6 +135,12 @@ function switchFade() {
     });
 }
 
+function makeLink() {
+    var uriParts = window.location.href.split('?');
+    var url = uriParts[0];
+    return (url + "?dwellTime=" + dwellTime + "&fadeTime=" + fadeTime + "&previousCount=" + previousCount);
+}
+
 function showPanel() {
     $('div.display').replaceWith(wotdPanels[wotdCurrentPanel]);
     $('.textfill').textfill({ innerTag: 'span', maxFontPixels: 288, });
@@ -160,8 +166,33 @@ function postLoadInit () {
     }
     __LOADED_postLoadInit = 1;
 
+    // See if Query String has options Set
+    if ("dwellTime" in urlParams) {
+        dwellTime = urlParams["dwellTime"];
+    }
+    if ("fadeTime" in urlParams) {
+        fadeTime = urlParams["fadeTime"];
+    }
+    if ("previousCount" in urlParams) {
+        previousCount = urlParams["previousCount"];
+    }
+
+    // Instantiate Link Dialog
+    $('#dialog-link').dialog({
+        autoOpen: false,
+        title: 'Link to This',
+        modal: true,
+        minWidth: 1360,
+        minHeight: 90,
+        buttons: {
+            "Ok": function() { 
+                $(this).dialog("close"); 
+            } 
+        },
+    }).removeClass('hidden'); // It starts off hidden so that you can't see it during the chains of callbacks, so show it.
+
     // Instantiate Options Dialog
-    $('#dialog-form').dialog({
+    $('#dialog-opts').dialog({
         autoOpen: false,
         title: 'Options',
         modal: true,
@@ -182,8 +213,11 @@ function postLoadInit () {
             } 
         },
     }).removeClass('hidden'); // It starts off hidden so that you can't see it during the chains of callbacks, so show it.
-    $('#btn-config').click(function() { $('#dialog-form').dialog('open'); return false; });
+
+    $('#btn-config').click(function() { $('#dialog-opts').dialog('open'); return false; });
     $('#btn-calendar').click(function() { window.open('https://www.google.com/calendar/embed?src=u6g675oejpdha4pncv50rmi8tc%40group.calendar.google.com&ctz=America/Chicago', "googCal")});
+    $('#btn-makelink').click(function() { $("#aro-link-textarea-url").val(makeLink()); $('#dialog-link').dialog('open'); return false; }); 
+        
 
     // Populate form elements with current js variable values
     $('#aro-form-textbox-dwell').val(dwellTime / 1000);
@@ -249,12 +283,14 @@ function callback (result) {
         var Today = Date.today().toString('dd');
          $('#today').replaceWith('<span id="today">' + Today + '</span>');
 
+        // Initialization
+        postLoadInit();
+
         // Get entries and make panels
         var entries = result.feed.getEntries();
         wotdPanels = makePanels(entries);
 
         // Get things going with the roller
-        postLoadInit();
         showPanel(); // Get started with first panel
     });
 };
@@ -283,21 +319,39 @@ google.setOnLoadCallback(_run);
 <!-- HTML: Body {{{1 -->
 <body>
 <div id="container">
+    <!-- Button Bar -->
     <div id="buttonbar">
-        <div class="fadeAble" id="btn-config"><img id="img-config" src="images/Gear-UI-48.png" width="48" height="48"></div>
+        <div class="fadeAble" id="btn-config"><img id="img-config" src="images/Retina-Display-icons/Gear-UI.png" width="48" height="48"></div>
+
+        <div class="fadeAble" id="btn-makelink"><img id="img-makelink" src="images/Retina-Display-icons/Link-UI.png" width="48" height="48"></div>
 
         <div class="fadeAble" id="btn-calendar">
             <img id="img-calendar" src="images/_blank-Calendar-UI-48.png" width="48" height="48">
             <div id="date-text"><span id="today"></span></div>
         </div>
     </div>
+    <!-- Main Display -->
     <div class="display">
         <div class="textfill" id="subject"><span></span></div>
         <div id="footer"/>
     </div>
 </div>
 
-<div class="hidden" id="dialog-form" title="Announcement Options">
+<!-- Link Dialog Box -->
+<div class="hidden" id="dialog-link">
+    <form id="aro-link">
+    <fieldset>
+        <div id="aro-link-textarea">
+            <div class="form-element-control">
+                <textarea id="aro-link-textarea-url" class="stealthy-textarea ui-widget-content ui-corner-all"></textarea>
+            </div>
+        </div>
+	</fieldset>
+    </form>
+</div>
+
+<!-- Options Dialog Box -->
+<div class="hidden" id="dialog-opts">
     <form id="aro-form">
     <fieldset>
         <div id="form-dwell" class="form-element">

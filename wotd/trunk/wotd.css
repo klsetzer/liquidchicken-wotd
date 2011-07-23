@@ -45,8 +45,10 @@ label   {float:left; margin-left:10px; margin-top:-15px; padding: 2px 6px 3px; b
 #form-fade label{ border:1px solid #005500; }
 #form-pastwords label{ border:1px solid #000099; }
 #form-source label{ border:1px solid #880088; }
-textarea {border:none; height:90px; width:950px; max-height:90px; max-width:950px;}
+textarea {border:none; height:90px; width:950px; max-height:180px; max-width:950px;}
+#aro-link-textarea-url {border:none; height:90px; width:1250px; max-height:90px; max-width:1250px;}
 .stealthy-textbox {float:left; border:none; width:90px; }
+.stealthy-textarea {border:none; resize:none; }
 
 .form-element {margin-bottom:48px; border-top:1px solid gray; }
 .form-element-label { clear:both; }
