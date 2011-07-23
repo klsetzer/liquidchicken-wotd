@@ -39,7 +39,7 @@ fieldset    { border:none; margin-top:22px;}
 
 /* Form styling */
 .muted  {color:#555555; font-style:italic; font-weight:normal; font-size:14px;}
-label   {float:left; margin-left:10px; margin-top:-15px; padding: 2px 6px 3px; background-image:url(jquery-ui/css/custom-theme/images/ui-bg_flat_0_000000_40x100.png);}
+label   {float:left; margin-left:10px; margin-top:-15px; padding: 2px 6px 3px; background-image:url(js/jquery-ui/css/custom-theme/images/ui-bg_flat_0_000000_40x100.png);}
 .slider {margin:0px 15px 15px 24px;}
 #form-dwell label{ border:1px solid #880000; }
 #form-fade label{ border:1px solid #005500; }
