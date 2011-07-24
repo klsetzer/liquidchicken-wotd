@@ -1,4 +1,3 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html>
 <head>
     <title>Word of the Day</title>
@@ -122,7 +121,7 @@ var maxResults = 3652; // 10 years worth of results, counting leap years
 
 var __LOADED_postLoadInit = 0;
 
-function switchFade() {
+function switchFade() { //{{{2
     wotdCurrentPanel++;
     $('div.display').fadeOut(fadeTime,function(){
         if(wotdCurrentPanel >= wotdPanels.length) {
@@ -133,21 +132,21 @@ function switchFade() {
             showPanel();
         }
     });
-}
+} //}}}
 
-function makeLink() {
+function makeLink() { //{{{2
     var uriParts = window.location.href.split('?');
     var url = uriParts[0];
     return (url + "?dwellTime=" + dwellTime + "&fadeTime=" + fadeTime + "&previousCount=" + previousCount);
-}
+} //}}}
 
-function showPanel() {
+function showPanel() { //{{{2
     $('div.display').replaceWith(wotdPanels[wotdCurrentPanel]);
     $('.textfill').textfill({ innerTag: 'span', maxFontPixels: 288, });
     timer = setTimeout(switchFade,dwellTime); 
-}
+} //}}}
 
-function makePanels(entries) {
+function makePanels(entries) { //{{{2
     var eventTitle = entries[0].getTitle().getText();
     var panels = [];
     panels.push('<div class="display"><div class="textfill" id="subject"><span>' + entries[0].getTitle().getText() + '</span></div><div id="footer">Word of the Day</div></div>');
@@ -156,11 +155,35 @@ function makePanels(entries) {
     for (var i = 1; i <= previousCount; i++) {
         pastWords.push(entries[i].getTitle().getText() + '<br/>');
     }
-    panels.push('<div class="display"><div class="textfill"><div id="subject"><span>' + pastWords.join('') + '</span></div></div><div id="footer">Previous Words of the Day</div></div>');
+    panels.push('<div class="display"><div class="textfill" id="subject"><span>' + pastWords.join('') + '</span></div><div id="footer">Previous Words of the Day</div></div>');
     return(panels);
+} //}}}
+
+function addWordDialog () { //{{{2
+    var calendarService = new google.gdata.calendar.CalendarService('LiquidChicken-wotdDisplayer-1.0');
+    var query = new google.gdata.calendar.CalendarEventQuery(feedUrl);
+    query.setMaxResults(4); // Keep us out of trouble
+    calendarService.getEventsFeed(query, addWordBuilderCallBack, handleError);
+} //}}}
+
+function addWordBuilderCallBack (result) {
+    // Get entries and make panels
+//        $("#aro-addword-textarea-words").val( $("#aro-addword-textarea-words").val() + entries[i].getTitle().getText() + " " );
+    var entries = result.feed.getEntries();
+    var wordContainer = $("#aro-addword-wordshere");
+    var words = [];
+    $.each(entries,
+        function(i,o) { 
+            words.push(o.getTitle().getText());
+        });
+    $.each(words.sort(),
+        function(i,o) {
+            wordContainer.append(" " + o);
+        });
+    $('.textfill').textfill({ innerTag: 'span', maxFontPixels: 288, });
 }
 
-function postLoadInit () {
+function postLoadInit () { //{{{2
     if (__LOADED_postLoadInit != 0) {
         return true;
     }
@@ -176,6 +199,21 @@ function postLoadInit () {
     if ("previousCount" in urlParams) {
         previousCount = urlParams["previousCount"];
     }
+
+    // Instantiate Add Word Dialog
+    $('#dialog-addword').dialog({
+        autoOpen: true,
+        title: 'Add Word',
+        modal: true,
+        minWidth: 1024,
+        minHeight: 480,
+        open: addWordDialog,
+        buttons: {
+            "Ok": function() { 
+                $(this).dialog("close"); 
+            } 
+        },
+    }).removeClass('hidden'); // It starts off hidden so that you can't see it during the chains of callbacks, so show it.
 
     // Instantiate Link Dialog
     $('#dialog-link').dialog({
@@ -214,8 +252,9 @@ function postLoadInit () {
         },
     }).removeClass('hidden'); // It starts off hidden so that you can't see it during the chains of callbacks, so show it.
 
-    $('#btn-config').click(function() { $('#dialog-opts').dialog('open'); return false; });
-    $('#btn-calendar').click(function() { window.open('https://www.google.com/calendar/embed?src=u6g675oejpdha4pncv50rmi8tc%40group.calendar.google.com&ctz=America/Chicago', "googCal")});
+    $('#btn-config').click(function()   { $('#dialog-opts').dialog('open'); return false; });
+    $('#btn-calendar').click(function() { $('#dialog-addword').dialog('open'); return false; });
+//    $('#btn-calendar').click(function() { window.open('https://www.google.com/calendar/embed?src=u6g675oejpdha4pncv50rmi8tc%40group.calendar.google.com&ctz=America/Chicago', "googCal")});
     $('#btn-makelink').click(function() { $("#aro-link-textarea-url").val(makeLink()); $('#dialog-link').dialog('open'); return false; }); 
         
 
@@ -224,6 +263,13 @@ function postLoadInit () {
     $('#aro-form-textbox-fade').val(fadeTime / 1000);
     $('#aro-form-textarea-source').val(feedUrl);
     $('#aro-form-textbox-pastwords' ).val(previousCount);
+
+    // Add Word
+    $('#aro-addword-textbox-newword').keyup(function () {
+        $('#aro-addword-textbox-newword').val();
+
+        $('#aro-addword-textarea-words').val();
+    });
 
     // DWELL TIME
     // == textbox updates slider
@@ -275,9 +321,9 @@ function postLoadInit () {
         }
     });
 
-}
+} //}}}
 
-function callback (result) {
+function callback (result) { //{{{2
     $(function() {
         // Set today's date for the calendar icon
         var Today = Date.today().toString('dd');
@@ -293,7 +339,7 @@ function callback (result) {
         // Get things going with the roller
         showPanel(); // Get started with first panel
     });
-};
+} //}}}
     
 // Error handler to be invoked when getEventsFeed() produces an error
 var handleError = function (error) {
@@ -337,7 +383,15 @@ google.setOnLoadCallback(_run);
     </div>
 </div>
 
-<!-- Link Dialog Box -->
+<!-- Add Word Dialog Box -->
+<div class="hidden" id="dialog-addword">
+    <form id="aro-addword">
+        <div id="aro-addword-form-newword"><input type="text" size="40" id="aro-addword-textbox-newword" class="ui-widget-content"></div>
+    </form>
+    <div id="aro-addword-wordshere" class="textfill"><span></span></div>
+</div>
+
+<!-- Link Dialog Box {{{2 -->
 <div class="hidden" id="dialog-link">
     <form id="aro-link">
     <fieldset>
@@ -349,8 +403,8 @@ google.setOnLoadCallback(_run);
 	</fieldset>
     </form>
 </div>
-
-<!-- Options Dialog Box -->
+<!-- }}} -->
+<!-- Options Dialog Box {{{2-->
 <div class="hidden" id="dialog-opts">
     <form id="aro-form">
     <fieldset>
@@ -387,7 +441,7 @@ google.setOnLoadCallback(_run);
 	</fieldset>
     </form>
 </div>
-
+<!-- }}} --->
 </body>
 <!-- HTML: Body }}} -->
 </html>
