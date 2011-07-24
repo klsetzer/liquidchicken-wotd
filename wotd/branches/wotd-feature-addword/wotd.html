@@ -1,7 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html>
-<head>
-    <title>Word of the Day</title>
+<head><title>Word of the Day</title>
 <!-- LICENSE {{{
 Copyright (c) 2011 Kelly Setzer 
 
@@ -108,6 +107,7 @@ var urlParams = {};
 <!-- Main JavaScript {{{ -->
 <script>
 
+<!-- Globals {{{2 -->
 var dwellTime = 3500;
 var fadeTime = 500;
 var previousCount = 3;
@@ -123,6 +123,7 @@ var wordHistory = [];
 
 var __LOADED_postLoadInit = 0;
 var __LOADED_addWordDialogGetFeed = false;
+<!-- }}} -->
 
 function switchFade() { // {{{2
     wotdCurrentPanel++;
@@ -162,7 +163,7 @@ function makePanels(entries) { // {{{2
     return(panels);
 } // }}}
 
-function addWordDialogGetFeed() {
+function addWordDialogGetFeed() { // {{{2
     if (__LOADED_addWordDialogGetFeed) {
         return true;
     }
@@ -172,17 +173,17 @@ function addWordDialogGetFeed() {
     var query = new google.gdata.calendar.CalendarEventQuery(feedUrl);
     query.setMaxResults(maxResults);
     calendarService.getEventsFeed(query, addWordDialogCallBack, handleError);
-}
+} // }}}
 
-function addWordDialogCallBack (result) {
+function addWordDialogCallBack (result) { // {{{2
     var entries = result.feed.getEntries();
     for (var i = entries.length -1; i>=0; i--) { 
         wordHistory.push(entries[i].getTitle().getText());
     }
     wordHistory = wordHistory.sort();
-}
+} // }}}
 
-function updateAddWordHistory (input) {
+function updateAddWordHistory (input) { // {{{2
     var matched = [];
     if (input) {
         for (var i = wordHistory.length - 1; word = wordHistory[i], i>=0; i--) { 
@@ -193,10 +194,15 @@ function updateAddWordHistory (input) {
     } else {
         matched = wordHistory;
     }
+    if (matched.length === 0) {
+        $("#aro-addword-textbox-newword").addClass('goodbad').removeClass('badgood');
+    } else {
+        $("#aro-addword-textbox-newword").addClass('badgood').removeClass('goodbad');
+    }
 
     $("#aro-addword-wordshere").replaceWith('<div id="aro-addword-wordshere" class="textfill"><span>' + matched.join(" ") + '</span></div>');
     $('.textfill').textfill({ innerTag: 'span', maxFontPixels: 288, });
-}
+} // }}}
 
 function addWordDialog () { // {{{2
     // Get entries and make panels
@@ -365,12 +371,12 @@ function callback (result) { //{{{2
     });
 } //}}}
     
+var handleError = function (error) { // {{{2
 // Error handler to be invoked when getEventsFeed() produces an error
-var handleError = function (error) {
     $('div.display').replaceWith('<pre>' + error + '</pre>');
-};
+}; // }}}
 
-function _run() {
+function _run() { // {{{2
     var calendarService = new google.gdata.calendar.CalendarService('LiquidChicken-wotdDisplayer-1.0');
     var query = new google.gdata.calendar.CalendarEventQuery(feedUrl);
     query.setMaxResults(maxResults);
@@ -380,15 +386,15 @@ function _run() {
     query.setMaximumStartTime(maxDate);
     query.setMaxResults(maxResults); // Keep us out of trouble
     calendarService.getEventsFeed(query, callback, handleError);
-}
+} // }}}
 
 google.setOnLoadCallback(_run);
 
 </script>
 <!-- Main JavaScript }}} -->
 </head>
-<!-- HTML: Body {{{1 -->
-<body>
+<body> <!-- {{{1 -->
+<!-- Container {{{2 -->
 <div id="container">
     <!-- Button Bar -->
     <div id="buttonbar">
@@ -407,15 +413,14 @@ google.setOnLoadCallback(_run);
         <div id="footer"/>
     </div>
 </div>
-
-<!-- Add Word Dialog Box -->
+<!-- }}} -->
+<!-- Add Word Dialog Box {{{2 -->
 <div class="hidden" id="dialog-addword">
     <form id="aro-addword">
-        <div id="aro-addword-form-newword"><input type="text" size="40" id="aro-addword-textbox-newword" class="ui-widget-content"></div>
+        <div id="aro-addword-form-newword"><input type="text" size="40" id="aro-addword-textbox-newword" class="goodbad"></div>
     </form>
     <div id="aro-addword-wordshere" class="textfill"><span></span></div>
-</div>
-
+</div> <!-- }}} -->
 <!-- Link Dialog Box {{{2 -->
 <div class="hidden" id="dialog-link">
     <form id="aro-link">
@@ -468,5 +473,5 @@ google.setOnLoadCallback(_run);
 </div>
 <!-- }}} --->
 </body>
-<!-- HTML: Body }}} -->
+<!--  }}} -->
 </html>
