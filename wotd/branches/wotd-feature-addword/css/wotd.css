@@ -39,6 +39,7 @@ img         { margin: 2px 2px; }
     } /* }}} */
 
 /* Addword Dialog Styling */
+#aro-addword-wordshere  { border:1px; height:440px; overflow:hidden;}
 
 /* Form/Dialog styling */
     /* general */

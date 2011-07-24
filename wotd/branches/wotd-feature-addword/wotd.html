@@ -1,3 +1,4 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html>
 <head>
     <title>Word of the Day</title>
@@ -118,10 +119,12 @@ var wotdCurrentPanel = 0;
 var timer;
 var runState = "running";
 var maxResults = 3652; // 10 years worth of results, counting leap years
+var wordHistory = [];
 
 var __LOADED_postLoadInit = 0;
+var __LOADED_addWordDialogGetFeed = false;
 
-function switchFade() { //{{{2
+function switchFade() { // {{{2
     wotdCurrentPanel++;
     $('div.display').fadeOut(fadeTime,function(){
         if(wotdCurrentPanel >= wotdPanels.length) {
@@ -132,21 +135,21 @@ function switchFade() { //{{{2
             showPanel();
         }
     });
-} //}}}
+} // }}}
 
-function makeLink() { //{{{2
+function makeLink() { // {{{2
     var uriParts = window.location.href.split('?');
     var url = uriParts[0];
     return (url + "?dwellTime=" + dwellTime + "&fadeTime=" + fadeTime + "&previousCount=" + previousCount);
-} //}}}
+} // }}}
 
-function showPanel() { //{{{2
+function showPanel() { // {{{2
     $('div.display').replaceWith(wotdPanels[wotdCurrentPanel]);
     $('.textfill').textfill({ innerTag: 'span', maxFontPixels: 288, });
     timer = setTimeout(switchFade,dwellTime); 
-} //}}}
+} // }}}
 
-function makePanels(entries) { //{{{2
+function makePanels(entries) { // {{{2
     var eventTitle = entries[0].getTitle().getText();
     var panels = [];
     panels.push('<div class="display"><div class="textfill" id="subject"><span>' + entries[0].getTitle().getText() + '</span></div><div id="footer">Word of the Day</div></div>');
@@ -157,37 +160,56 @@ function makePanels(entries) { //{{{2
     }
     panels.push('<div class="display"><div class="textfill" id="subject"><span>' + pastWords.join('') + '</span></div><div id="footer">Previous Words of the Day</div></div>');
     return(panels);
-} //}}}
+} // }}}
 
-function addWordDialog () { //{{{2
+function addWordDialogGetFeed() {
+    if (__LOADED_addWordDialogGetFeed) {
+        return true;
+    }
+    __LOADED_addWordDialogGetFeed = true;
+
     var calendarService = new google.gdata.calendar.CalendarService('LiquidChicken-wotdDisplayer-1.0');
     var query = new google.gdata.calendar.CalendarEventQuery(feedUrl);
-    query.setMaxResults(4); // Keep us out of trouble
-    calendarService.getEventsFeed(query, addWordBuilderCallBack, handleError);
-} //}}}
+    query.setMaxResults(maxResults);
+    calendarService.getEventsFeed(query, addWordDialogCallBack, handleError);
+}
 
-function addWordBuilderCallBack (result) {
-    // Get entries and make panels
-//        $("#aro-addword-textarea-words").val( $("#aro-addword-textarea-words").val() + entries[i].getTitle().getText() + " " );
+function addWordDialogCallBack (result) {
     var entries = result.feed.getEntries();
-    var wordContainer = $("#aro-addword-wordshere");
-    var words = [];
-    $.each(entries,
-        function(i,o) { 
-            words.push(o.getTitle().getText());
-        });
-    $.each(words.sort(),
-        function(i,o) {
-            wordContainer.append(" " + o);
-        });
+    for (var i = entries.length -1; i>=0; i--) { 
+        wordHistory.push(entries[i].getTitle().getText());
+    }
+    wordHistory = wordHistory.sort();
+}
+
+function updateAddWordHistory (input) {
+    var matched = [];
+    if (input) {
+        for (var i = wordHistory.length - 1; word = wordHistory[i], i>=0; i--) { 
+            if(word.indexOf(input) === 0) {
+                matched.push(word);
+            }
+        }
+    } else {
+        matched = wordHistory;
+    }
+
+    $("#aro-addword-wordshere").replaceWith('<div id="aro-addword-wordshere" class="textfill"><span>' + matched.join(" ") + '</span></div>');
     $('.textfill').textfill({ innerTag: 'span', maxFontPixels: 288, });
 }
+
+function addWordDialog () { // {{{2
+    // Get entries and make panels
+    $("#aro-addword-wordshere").replaceWith('<div id="aro-addword-wordshere" class="textfill"><span>' + wordHistory.join(" ") + '</span></div>');
+    $('.textfill').textfill({ innerTag: 'span', maxFontPixels: 288, });
+} // }}}
 
 function postLoadInit () { //{{{2
     if (__LOADED_postLoadInit != 0) {
         return true;
     }
     __LOADED_postLoadInit = 1;
+
 
     // See if Query String has options Set
     if ("dwellTime" in urlParams) {
@@ -201,8 +223,9 @@ function postLoadInit () { //{{{2
     }
 
     // Instantiate Add Word Dialog
+    addWordDialogGetFeed(); // Get the words for the Add Word dialog pre-emptively
     $('#dialog-addword').dialog({
-        autoOpen: true,
+        autoOpen: false,
         title: 'Add Word',
         modal: true,
         minWidth: 1024,
@@ -252,9 +275,9 @@ function postLoadInit () { //{{{2
         },
     }).removeClass('hidden'); // It starts off hidden so that you can't see it during the chains of callbacks, so show it.
 
+    // Button Bar Actions
     $('#btn-config').click(function()   { $('#dialog-opts').dialog('open'); return false; });
     $('#btn-calendar').click(function() { $('#dialog-addword').dialog('open'); return false; });
-//    $('#btn-calendar').click(function() { window.open('https://www.google.com/calendar/embed?src=u6g675oejpdha4pncv50rmi8tc%40group.calendar.google.com&ctz=America/Chicago', "googCal")});
     $('#btn-makelink').click(function() { $("#aro-link-textarea-url").val(makeLink()); $('#dialog-link').dialog('open'); return false; }); 
         
 
@@ -264,13 +287,14 @@ function postLoadInit () { //{{{2
     $('#aro-form-textarea-source').val(feedUrl);
     $('#aro-form-textbox-pastwords' ).val(previousCount);
 
-    // Add Word
+    // Add Word Actions
     $('#aro-addword-textbox-newword').keyup(function () {
-        $('#aro-addword-textbox-newword').val();
-
-        $('#aro-addword-textarea-words').val();
+        var asd = $('#aro-addword-textbox-newword').val();
+        updateAddWordHistory($('#aro-addword-textbox-newword').val());
+        var xyz =1;
     });
 
+    // Options Dialog control behaviors
     // DWELL TIME
     // == textbox updates slider
     $('#aro-form-textbox-dwell').keyup(function () {
@@ -349,6 +373,7 @@ var handleError = function (error) {
 function _run() {
     var calendarService = new google.gdata.calendar.CalendarService('LiquidChicken-wotdDisplayer-1.0');
     var query = new google.gdata.calendar.CalendarEventQuery(feedUrl);
+    query.setMaxResults(maxResults);
     query.setOrderBy('starttime');
     query.setSortOrder('descending');
     var maxDate = new google.gdata.DateTime(Date.today());
