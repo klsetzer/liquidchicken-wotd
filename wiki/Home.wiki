@@ -14,3 +14,4 @@ The LiquidChicken Word of the Day Roller polls a Google calendar for current and
   * Get working with jsapi key?? Why?
   * Make themable (themeroller?)
   * Each panel should have its own timer
+  * Refine dialog styles
