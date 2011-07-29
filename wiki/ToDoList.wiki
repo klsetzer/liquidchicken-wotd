@@ -3,4 +3,6 @@
   * Squarefill + textfill
   * Squarefill integration or replacement
   * Add word/calendar dialog
-  * Refine dialog styles
+    * Quick add with auto-selected next day
+    * date picker
+    * authentication so it will actually add
